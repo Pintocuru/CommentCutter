@@ -1,6 +1,6 @@
 // src/services/dataService.ts
+import { SETTINGS } from '@/types/settings'
 import { PluginResponse } from '@onecomme.com/onesdk/'
-import { SETTINGS } from '@/Modules/settings'
 import fs from 'fs/promises'
 import path from 'path'
 

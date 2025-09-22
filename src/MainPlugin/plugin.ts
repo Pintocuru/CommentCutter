@@ -1,58 +1,75 @@
-// src\MainPlugin\plugin.ts
-import { SETTINGS } from '@/Modules/settings'
-import { defaultState } from '@/Modules/defaultState'
+// src/MainPlugin/plugin.ts (Pinia統合版)
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
-import { OnePlugin, PluginResponse, PluginRequest } from '@onecomme.com/onesdk/'
+import { OnePlugin, PluginResponse, PluginRequest, PluginAPI } from '@onecomme.com/onesdk/'
 import { handlePostRequest } from './handlers/postHandler'
 import { handleGetRequest } from './handlers/getHandler'
-import { initializeDataDirectory } from './utils/fileUtils'
+import { DataSchema } from '@/types/type'
+import { SETTINGS } from '@/types/settings'
+import { useCommentCutterStore } from '@/stores/pluginStore'
+import { createPinia } from 'pinia'
+import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
+
+// プラグイン専用のPiniaインスタンス
+const pluginPinia = createPinia()
 
 const plugin: OnePlugin = {
-  name: 'コメントカッタープラグイン CommentCutter', // プラグイン名
-  uid: SETTINGS.PLUGIN_UID, // プラグイン固有の一意のID
-  version: '0.0.1', // プラグインのバージョン番号
-  author: 'Pintocuru', // 開発者名
-  url: '', // サポートページのURL
+  name: 'コメントカッタープラグイン CommentCutter',
+  uid: SETTINGS.PLUGIN_UID,
+  version: '0.0.1',
+  author: 'Pintocuru',
+  url: '',
   permissions: ['comments'],
 
-  // プラグインの初期状態
-  defaultState: defaultState,
+  defaultState: DataSchema.parse({}),
 
-  // プラグインの初期化
-  async init() {
-    await initializeDataDirectory()
+  async init(api: PluginAPI, initialData) {
+    try {
+      // ストアを初期化（プラグインモード）
+      const store = useCommentCutterStore(pluginPinia)
+      const storeData = api.store.get('pluginData', this.defaultState)
+
+      // api.storeの参照を渡して初期化
+      store.initialize(storeData, false, api.store, 'pluginData')
+
+      console.log('Plugin initialized with Pinia store')
+    } catch (error) {
+      console.error('Plugin initialization failed:', error)
+      postSystemMessage(`プラグインの初期化に失敗しました: ${error}`, SETTINGS.botName)
+      throw error
+    }
   },
 
-  // filterComment:コメントを加工・変更する
   async filterComment(comment, service, userData) {
-    // 対象となるフィルタリングの値
-    /**
-     * comment: 'チャットワード',
-     *  access: 'ユーザーの役職',
-     * gift: 'ギフト',
-     *  count: 'チャット数',
-     * service: '配信プラットフォーム',
-     * userId: 'ユーザーID',
-     * username: 'ユーザー名',
-     */
+    try {
+      const store = useCommentCutterStore(pluginPinia)
 
-    // 自身のプラグインの投稿（botの投稿）はおみくじを行わない
+      if (!store.isInitialized || !store.hasActivePreset) {
+        return comment
+      }
 
-    return false
+      const threshold = store.currentPreset?.threshold
+      if (!threshold) return comment
+
+      // マッチしたらfalse
+      const isMatched = checkAllConditions(comment, threshold)
+
+      return isMatched ? false : comment
+    } catch (error) {
+      console.error('Filter comment error:', error)
+      postSystemMessage(`フィルタリングエラー: ${error}`, SETTINGS.botName)
+      return comment
+    }
   },
 
-  // Rest APIを使った送受信
   async request(req: PluginRequest): Promise<PluginResponse> {
     try {
       const { method, url, body } = req
-
-      // URLからパスを抽出（例: /api/package -> package）
       const pathSegments = url.split('/').filter((segment) => segment !== '' && segment !== 'api')
 
       if (method === 'POST') {
-        return await handlePostRequest(body, pathSegments)
+        return await handlePostRequest(body, pathSegments, pluginPinia)
       } else if (method === 'GET') {
-        return await handleGetRequest(pathSegments, req.params)
+        return await handleGetRequest(pathSegments, req.params, pluginPinia)
       }
 
       return {
@@ -63,7 +80,6 @@ const plugin: OnePlugin = {
       console.error('Request handling error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
-      // コメントテスターでエラーをコメントさせる
       postSystemMessage(`エラーが発生しました: ${errorMessage}`, SETTINGS.botName)
 
       return {
@@ -72,10 +88,17 @@ const plugin: OnePlugin = {
       }
     }
   },
+
+  destroy() {
+    try {
+      const store = useCommentCutterStore(pluginPinia)
+      // destroyメソッドで最終保存とクリーンアップ
+      store.destroy()
+      console.log('Plugin destroyed and Pinia store cleaned up')
+    } catch (error) {
+      console.error('Plugin destroy error:', error)
+    }
+  },
 }
 
 export default plugin
-
-export class hoge {
-  constructor() {}
-}

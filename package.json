@@ -1,16 +1,11 @@
 {
-  "name": "omikuji-bot",
-  "version": "1.1.1",
-  "description": "おみくじ付きBOTジェネレーター",
+  "name": "comment-cutter",
+  "version": "0.0.1",
+  "description": "コメントフィルタープラグイン",
   "scripts": {
-    "dev:omikujiBot": "concurrently \"npm run devApi:omikujiBot\" \"npm run devHot:omikujiBot\"",
-    "devHot:omikujiBot": "vite",
-    "devApi:omikujiBot": "tsx server/start-dev-server.ts",
-    "lint:omikujiBot": "eslint src/**/*.{ts,vue}",
-    "lintLevel2:omikujiBot": "cross-env VITE_TS_CHECK_LEVEL=beta eslint src/**/*.{ts,vue}",
-    "lintLevel3:omikujiBot": "cross-env VITE_TS_CHECK_LEVEL=production eslint src/**/*.{ts,vue}",
-    "test:omikujiBot": "jest --testPathPatterns UserCommentProcessor",
-    "build:omikujiBot": "tsx tools/build.ts"
+    "dev:CommentCutter": "vite",
+    "lint:CommentCutter": "eslint src/**/*.{ts,vue}",
+    "build:CommentCutter": "webpack"
   },
   "author": "Pintocuru(せすじピンとしてます)",
   "license": "Apache-2.0",

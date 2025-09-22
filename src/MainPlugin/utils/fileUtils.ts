@@ -1,5 +1,5 @@
 // src/utils/fileUtils.ts
-import { SETTINGS } from '@/Modules/settings'
+import { SETTINGS } from '@/types/settings'
 import { PackageMetaType } from '@shared/types'
 import fs from 'fs/promises'
 import path from 'path'
