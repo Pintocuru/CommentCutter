@@ -1,0 +1,19 @@
+{
+  "name": "omikuji-bot",
+  "version": "1.1.1",
+  "description": "おみくじ付きBOTジェネレーター",
+  "scripts": {
+    "dev:omikujiBot": "concurrently \"npm run devApi:omikujiBot\" \"npm run devHot:omikujiBot\"",
+    "devHot:omikujiBot": "vite",
+    "devApi:omikujiBot": "tsx server/start-dev-server.ts",
+    "lint:omikujiBot": "eslint src/**/*.{ts,vue}",
+    "lintLevel2:omikujiBot": "cross-env VITE_TS_CHECK_LEVEL=beta eslint src/**/*.{ts,vue}",
+    "lintLevel3:omikujiBot": "cross-env VITE_TS_CHECK_LEVEL=production eslint src/**/*.{ts,vue}",
+    "test:omikujiBot": "jest --testPathPatterns UserCommentProcessor",
+    "build:omikujiBot": "tsx tools/build.ts"
+  },
+  "author": "Pintocuru(せすじピンとしてます)",
+  "license": "Apache-2.0",
+  "main": "src/main.js",
+  "type": "module"
+}
