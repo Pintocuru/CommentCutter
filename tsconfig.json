@@ -5,7 +5,8 @@
   "moduleResolution": "Bundler",
   "target": "ES2020",
   "types": [
-   "node"
+   "node",
+   "jest"
   ],
   "esModuleInterop": true,
   "strict": true,
@@ -36,7 +37,6 @@
  ],
  "exclude": [
   "node_modules",
-  "archives",
-  "**/*.test.ts"
+  "archives"
  ]
 }

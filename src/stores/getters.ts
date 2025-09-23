@@ -5,23 +5,23 @@ import { createState } from './state'
 
 export const createGetters = (state: ReturnType<typeof createState>) => ({
   currentPreset: computed(() => {
-    if (!state.data.value.target) return null
-    return state.data.value.presets.find((preset) => preset.id === state.data.value.target) || null
+    const key = state.data.value.target
+    return key ? (state.data.value.presets[key] ?? null) : null
   }),
 
   selectedPreset: computed(() => {
-    if (!state.selectedPresetId.value) return null
-    return state.data.value.presets.find((preset) => preset.id === state.selectedPresetId.value) || null
+    const key = state.selectedPresetId.value
+    return key ? (state.data.value.presets[key] ?? null) : null
   }),
 
-  allPresets: computed(() => state.data.value.presets),
+  allPresets: computed(() => Object.values(state.data.value.presets)),
 
-  hasPresets: computed(() => state.data.value.presets.length > 0),
+  hasPresets: computed(() => Object.keys(state.data.value.presets).length > 0),
 
   hasActivePreset: computed(() => !!state.data.value.target),
 
   presetsOptions: computed(() =>
-    state.data.value.presets.map((preset) => ({
+    Object.values(state.data.value.presets).map((preset) => ({
       value: preset.id,
       label: preset.name || preset.id,
       description: preset.description || '',

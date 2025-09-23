@@ -38,11 +38,12 @@ export const CutterThresholdConditionSchema = z.enum(CutterThresholdCondition).d
 
 export const CutterThresholdSchema = z.object({
   conditions: z.array(CutterThresholdConditionSchema).catch([]),
-  comment: z.array(z.string()).catch([]),
-  access: z.array(AccessConditionSchema).catch([]),
-  gift: z.array(GiftConditionSchema).catch([]),
-  count: CountConditionSchema.catch(CountConditionSchema.parse({})),
-  userId: z.array(z.string()).catch([]),
-  username: z.array(z.string()).catch([]),
+  comment: z.array(z.string()).catch([]).optional(),
+  access: z.array(AccessConditionSchema).catch([]).optional(),
+  gift: z.array(GiftConditionSchema).catch([]).optional(),
+  count: CountConditionSchema.catch(CountConditionSchema.parse({})).optional(),
+  userId: z.array(z.string()).catch([]).optional(),
+  username: z.array(z.string()).catch([]).optional(),
 })
+
 export type CutterThresholdType = z.infer<typeof CutterThresholdSchema>

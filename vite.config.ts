@@ -1,4 +1,4 @@
-// [Package] vite.config.ts
+// vite.config.ts
 import { defineConfig, mergeConfig } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -14,32 +14,73 @@ const base = baseViteConfig(__dirname)
 const tsAliases = createViteAliases(__dirname)
 export const alias = { ...rootAlias, ...tsAliases }
 
-// ホットリロード用設定
 export default defineConfig(() => {
-  const checkLevel = process.env.VITE_TS_CHECK_LEVEL || 'development'
-
   return mergeConfig(base, {
-    root: path.resolve(__dirname),
-    resolve: { alias },
-    server: {
-      watch: {
-        // server フォルダは更新してもホットリロードしない
-        ignored: [path.resolve(__dirname, 'server/omikujiDatas/**')],
-      },
-    },
-    // チェックレベルに応じた追加設定
+    // ビルド設定
     build: {
-      rollupOptions:
-        checkLevel === 'production'
-          ? {
-              onwarn: (warning: any, warn: (w: any) => void) => {
-                if (warning.code === 'UNUSED_EXTERNAL_IMPORT') {
-                  throw new Error(warning.message)
-                }
-                warn(warning)
-              },
-            }
-          : {},
+      // ライブラリモードで構築
+      lib: {
+        entry: path.resolve(__dirname, 'src/MainPlugin/plugin.ts'),
+        name: 'Plugin',
+        fileName: () => 'plugin.js',
+        formats: ['cjs'], // 出力形式をCommonJSに指定
+      },
+
+      // 出力ディレクトリ
+      outDir: 'dist',
+      emptyOutDir: true,
+
+      // ロールアップ設定
+      rollupOptions: {
+        // 外部依存関係の指定
+        external: [
+          'fs',
+          'fs/promises',
+          'path',
+          'crypto',
+          'util',
+          'events',
+          'stream',
+          'buffer',
+          'os',
+          'url',
+          'querystring',
+          '@onecomme.com/onesdk',
+          'electron-store',
+        ],
+        output: {
+          // デフォルトエクスポートをCommonJSのexportsに直接変換
+          exports: 'default',
+        },
+      },
+
+      // ミニファイ設定
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: false,
+          drop_debugger: true,
+        },
+        mangle: {
+          // 特定の関数名は保持
+          reserved: ['init', 'request', 'subscribe', 'destroy', 'filterComment', 'filterSpeech'],
+        },
+      },
+
+      // ソースマップ生成
+      sourcemap: false,
+
+      // チャンクサイズ警告の無効化
+      chunkSizeWarningLimit: 1000,
+    },
+
+    // 解決設定
+    resolve: { alias: alias },
+    test: {
+      // コンソールメッセージを有効にする
+      silent: false,
+      // その他の設定
+      globals: true,
     },
   })
 })

@@ -1,13 +1,13 @@
 // src/MainPlugin/plugin.ts (Pinia統合版)
-import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
-import { OnePlugin, PluginResponse, PluginRequest, PluginAPI } from '@onecomme.com/onesdk/'
+import { SETTINGS } from '@/types/settings'
+import { DataSchema, DataSchemaType, PresetType } from '@/types/type'
 import { handlePostRequest } from './handlers/postHandler'
 import { handleGetRequest } from './handlers/getHandler'
-import { DataSchema } from '@/types/type'
-import { SETTINGS } from '@/types/settings'
 import { useCommentCutterStore } from '@/stores/pluginStore'
-import { createPinia } from 'pinia'
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
+import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
+import { createPinia } from 'pinia'
+import { OnePlugin, PluginResponse, PluginRequest, PluginAPI } from '@onecomme.com/onesdk/'
 
 // プラグイン専用のPiniaインスタンス
 const pluginPinia = createPinia()
@@ -18,7 +18,7 @@ const plugin: OnePlugin = {
   version: '0.0.1',
   author: 'Pintocuru',
   url: '',
-  permissions: ['comments'],
+  permissions: ['filter.comment'],
 
   defaultState: DataSchema.parse({}),
 
@@ -26,15 +26,23 @@ const plugin: OnePlugin = {
     try {
       // ストアを初期化（プラグインモード）
       const store = useCommentCutterStore(pluginPinia)
-      const storeData = api.store.get('pluginData', this.defaultState)
+      const storeData = api.store.store as DataSchemaType
+
+      // Check if the data exists before proceeding
+      if (!storeData || !storeData.target) {
+        const errorMsg = 'ストアデータが見つからないか、形式が不正です。'
+        ConsolePost('error', errorMsg, SETTINGS.botName)
+        throw new Error(errorMsg)
+      }
 
       // api.storeの参照を渡して初期化
       store.initialize(storeData, false, api.store, 'pluginData')
 
-      console.log('Plugin initialized with Pinia store')
+      // プラグインの起動メッセージ
+      ConsolePost('info', `【コメントカッタープラグイン】がONだよ`)
     } catch (error) {
       console.error('Plugin initialization failed:', error)
-      postSystemMessage(`プラグインの初期化に失敗しました: ${error}`, SETTINGS.botName)
+      ConsolePost('error', `プラグインの初期化に失敗しました: ${error}`, SETTINGS.botName)
       throw error
     }
   },
@@ -43,7 +51,9 @@ const plugin: OnePlugin = {
     try {
       const store = useCommentCutterStore(pluginPinia)
 
+      // TODO:コメントテスターであれば必ずtrue(commentを返す)
       if (!store.isInitialized || !store.hasActivePreset) {
+        ConsolePost('error', `初期化されてないよ`)
         return comment
       }
 
@@ -52,11 +62,16 @@ const plugin: OnePlugin = {
 
       // マッチしたらfalse
       const isMatched = checkAllConditions(comment, threshold)
+      if (isMatched) {
+        console.info(threshold, `test:弾かれたよ`)
+      } else {
+        console.info(threshold, `test:通ったよ`)
+      }
 
       return isMatched ? false : comment
     } catch (error) {
       console.error('Filter comment error:', error)
-      postSystemMessage(`フィルタリングエラー: ${error}`, SETTINGS.botName)
+      ConsolePost('error', `フィルタリングエラー: ${error}`, SETTINGS.botName)
       return comment
     }
   },
@@ -80,7 +95,7 @@ const plugin: OnePlugin = {
       console.error('Request handling error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
-      postSystemMessage(`エラーが発生しました: ${errorMessage}`, SETTINGS.botName)
+      ConsolePost('error', `エラーが発生しました: ${errorMessage}`, SETTINGS.botName)
 
       return {
         code: 500,
@@ -94,9 +109,9 @@ const plugin: OnePlugin = {
       const store = useCommentCutterStore(pluginPinia)
       // destroyメソッドで最終保存とクリーンアップ
       store.destroy()
-      console.log('Plugin destroyed and Pinia store cleaned up')
+      ConsolePost('info', '【コメントカッタープラグイン】がOFFだよ')
     } catch (error) {
-      console.error('Plugin destroy error:', error)
+      ConsolePost('error', 'Plugin destroy error:', error)
     }
   },
 }

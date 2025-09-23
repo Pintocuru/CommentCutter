@@ -21,7 +21,7 @@ export const PresetSchema = z.object({
  */
 export const DataSchema = z.object({
   target: z.string().default('omikuji').catch('omikuji'), // 使用するプリセットkey
-  presets: z.array(PresetSchema).catch([]),
+  presets: z.record(z.string(), PresetSchema).catch({}),
 })
 
 export type DataSchemaType = z.infer<typeof DataSchema>

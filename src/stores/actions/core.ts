@@ -20,16 +20,14 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     }
   }
 
-  const initialize = (
-    initialData?: Partial<DataSchemaType>,
-    editorMode = false,
-    apiStore?: any,
-    storageKey = 'pluginData'
-  ) => {
+  const initialize = (initialData: DataSchemaType, editorMode = false, apiStore?: any, storageKey = 'pluginData') => {
     try {
-      if (initialData) {
-        state.data.value = DataSchema.parse(initialData)
-      }
+      // 💡 元データを壊さないためにクローン
+      const cloned = JSON.parse(JSON.stringify(initialData ?? {}))
+
+      // 💡 スキーマで補完しつつ parse
+      state.data.value = DataSchema.parse(cloned)
+
       state.isInitialized.value = true
       state.isEditorMode.value = editorMode
       state.isDirty.value = false

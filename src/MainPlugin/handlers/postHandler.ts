@@ -113,42 +113,40 @@ async function handlePresetOperation(
   try {
     switch (operation) {
       case 'add':
-        if (data.presets && data.presets.length > 0) {
-          const newPreset = data.presets[0]
-          store.addPreset(newPreset)
-          await store.save()
+      case 'update': {
+        // data.presets が Record に変更されたため、キーの存在を確認
+        const presetKeys = Object.keys(data.presets || {})
+        if (presetKeys.length > 0) {
+          // 最初のプリセットを取得（どのキーが渡されるか不明なため、最初のキーを使用）
+          const presetId = presetKeys[0]
+          const updatedPreset = data.presets[presetId]
 
-          postSystemMessage(`プリセット「${newPreset.name}」を追加しました`, SETTINGS.botName)
-
-          return {
-            code: 201,
-            response: JSON.stringify({
-              success: true,
-              message: 'Preset added successfully',
-              preset: newPreset,
-            }),
+          if (!updatedPreset) {
+            throw new Error('No preset data provided or invalid preset key')
           }
-        }
-        throw new Error('No preset data provided')
 
-      case 'update':
-        if (data.presets && data.presets.length > 0) {
-          const updatedPreset = data.presets[0]
-          store.updatePreset(updatedPreset.id, updatedPreset)
+          if (operation === 'add') {
+            store.addPreset(updatedPreset)
+            postSystemMessage(`プリセット「${updatedPreset.name}」を追加しました`, SETTINGS.botName)
+          } else {
+            // operation === 'update'
+            store.updatePreset(updatedPreset.id, updatedPreset)
+            postSystemMessage(`プリセット「${updatedPreset.name}」を更新しました`, SETTINGS.botName)
+          }
+
           await store.save()
 
-          postSystemMessage(`プリセット「${updatedPreset.name}」を更新しました`, SETTINGS.botName)
-
           return {
-            code: 200,
+            code: operation === 'add' ? 201 : 200,
             response: JSON.stringify({
               success: true,
-              message: 'Preset updated successfully',
+              message: `Preset ${operation} successfully`,
               preset: updatedPreset,
             }),
           }
         }
         throw new Error('No preset data provided')
+      }
 
       case 'delete':
         if (data.target) {
