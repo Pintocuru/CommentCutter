@@ -1,7 +1,7 @@
 // src/MainPlugin/plugin.test.ts
 import { vi } from 'vitest'
 import plugin from './plugin'
-import { MockComment, MockCommentSchema } from '@shared/__mocks__/CreateMockComment'
+import { MockComment, MockCommentSchema } from '@shared/test-utils/CreateMockComment'
 
 // vi.mockをファイルの先頭に移動し、ファクトリー関数を使用
 vi.mock('@/stores/pluginStore', () => {

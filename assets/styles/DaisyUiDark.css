@@ -1,0 +1,5 @@
+/* shared/styles/DaisyUiDark.css */
+@import 'tailwindcss';
+@plugin "daisyui" {
+  themes: dark --default;
+}
