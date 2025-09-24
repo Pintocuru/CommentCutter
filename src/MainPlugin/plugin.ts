@@ -1,8 +1,8 @@
 // src/MainPlugin/plugin.ts (Pinia統合版)
 import { SETTINGS } from '@/types/settings'
-import { DataSchema, DataSchemaType, PresetType } from '@/types/type'
-import { handlePostRequest } from './handlers/postHandler'
-import { handleGetRequest } from './handlers/getHandler'
+import { DataSchema, DataSchemaType } from '@/types/type'
+import { handlePostRequest } from './services/postHandler'
+import { handleGetRequest } from './services/getHandler'
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
@@ -36,7 +36,7 @@ const plugin: OnePlugin = {
       }
 
       // api.storeの参照を渡して初期化
-      store.initialize(storeData, false, api.store, 'pluginData')
+      store.initialize(storeData, api.store, 'pluginData')
 
       // プラグインの起動メッセージ
       ConsolePost('info', `【コメントカッタープラグイン】がONだよ`)

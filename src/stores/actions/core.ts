@@ -2,6 +2,7 @@
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { createState } from '../state'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
+import ElectronStore from 'electron-store'
 
 export const createCoreActions = (state: ReturnType<typeof createState>) => {
   const setData = (newData: Partial<DataSchemaType>) => {
@@ -14,7 +15,11 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     }
   }
 
-  const initialize = (initialData: DataSchemaType, editorMode = false, apiStore?: any, storageKey = 'pluginData') => {
+  const initialize = (
+    initialData: DataSchemaType,
+    apiStore?: ElectronStore<Record<string, unknown>>,
+    storageKey = 'pluginData'
+  ) => {
     try {
       // 💡 元データを壊さないためにクローン
       const cloned = JSON.parse(JSON.stringify(initialData ?? {}))

@@ -6,12 +6,7 @@ export const createEditorActions = (state: ReturnType<typeof createState>) => {
     state.selectedPresetId.value = presetId
   }
 
-  const closePresetDialog = () => {
-    state.selectedPresetId.value = null
-  }
-
   return {
     selectPreset,
-    closePresetDialog,
   }
 }
