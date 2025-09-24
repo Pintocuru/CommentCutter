@@ -6,13 +6,7 @@ import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 export const createCoreActions = (state: ReturnType<typeof createState>) => {
   const setData = (newData: Partial<DataSchemaType>) => {
     try {
-      const oldData = { ...state.data.value }
       state.data.value = DataSchema.parse({ ...state.data.value, ...newData })
-      state.isDirty.value = true
-
-      if (!state.isEditorMode.value) {
-        console.log('Plugin data updated:', { oldData, newData: state.data.value })
-      }
     } catch (error) {
       ConsolePost('error', `データの更新に失敗しました: ${error}`)
       console.error('Store update error:', error)
@@ -29,8 +23,6 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       state.data.value = DataSchema.parse(cloned)
 
       state.isInitialized.value = true
-      state.isEditorMode.value = editorMode
-      state.isDirty.value = false
 
       if (apiStore) {
         state.electronStore.value = apiStore
@@ -51,7 +43,6 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
 
       // データ全体を置き換え
       state.data.value = validatedData
-      state.isDirty.value = true
 
       console.log('Store data updated successfully')
     } catch (error) {
@@ -71,7 +62,6 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       const validatedData = DataSchema.parse(newData)
 
       state.data.value = validatedData
-      state.isDirty.value = true
 
       console.log('Store data partially updated successfully')
     } catch (error) {
@@ -86,7 +76,6 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     try {
       const defaultData = DataSchema.parse({})
       state.data.value = defaultData
-      state.isDirty.value = true
 
       console.log('Store data reset to default')
     } catch (error) {

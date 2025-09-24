@@ -11,7 +11,6 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
       } else if (state.electronStore.value) {
         state.electronStore.value.set(state.storeKey.value, state.data.value)
       }
-      state.isDirty.value = false
     } catch (error) {
       ConsolePost('error', `データの保存に失敗しました: ${error}`)
       throw error
@@ -19,10 +18,9 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
   }
 
   const autoSave = async () => {
-    if (state.isDirty.value && state.electronStore.value) {
+    if (state.electronStore.value) {
       try {
         state.electronStore.value.set(state.storeKey.value, state.data.value)
-        state.isDirty.value = false
         console.log('Auto-saved plugin data')
       } catch (error) {
         console.error('Auto-save failed:', error)
@@ -38,7 +36,6 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
 
     try {
       state.electronStore.value.set(state.storeKey.value, state.data.value)
-      state.isDirty.value = false
       console.log('Data persisted to file')
     } catch (error) {
       ConsolePost('error', `ファイルへの保存に失敗しました: ${error}`)
@@ -54,7 +51,6 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
     try {
       const savedData = state.electronStore.value.get(state.storeKey.value, {})
       state.data.value = DataSchema.parse(savedData)
-      state.isDirty.value = false
       console.log('Data loaded from file')
     } catch (error) {
       ConsolePost('error', `ファイルからの読み込みに失敗しました: ${error}`)
@@ -64,9 +60,7 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
 
   const destroy = async () => {
     try {
-      if (state.isDirty.value) {
-        await autoSave()
-      }
+      await autoSave()
 
       // reset処理は外部から呼び出す
       state.electronStore.value = null

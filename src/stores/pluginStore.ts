@@ -22,9 +22,7 @@ export const useCommentCutterStore = defineStore('commentCutter', () => {
   // destroy処理は複数のアクションを組み合わせる必要があるため、ここで定義
   const destroy = async () => {
     try {
-      if (state.isDirty.value) {
-        await persistenceActions.autoSave()
-      }
+      await persistenceActions.autoSave()
       coreActions.reset()
       state.electronStore.value = null
       state.storeKey.value = 'pluginData'
@@ -38,10 +36,7 @@ export const useCommentCutterStore = defineStore('commentCutter', () => {
     // State (readonly)
     data: readonly(state.data),
     isInitialized: readonly(state.isInitialized),
-    isDirty: readonly(state.isDirty),
-    isEditorMode: readonly(state.isEditorMode),
     selectedPresetId: readonly(state.selectedPresetId),
-    isPresetDialogOpen: readonly(state.isPresetDialogOpen),
 
     // Getters
     ...getters,

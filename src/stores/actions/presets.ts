@@ -18,9 +18,7 @@ export const createPresetActions = (
       }
       coreActions.setData({ presets: newPresets })
 
-      if (state.isEditorMode.value) {
-        state.selectedPresetId.value = newPreset.id
-      }
+      state.selectedPresetId.value = newPreset.id
 
       return newPreset
     } catch (error) {
