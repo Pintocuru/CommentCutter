@@ -1,6 +1,7 @@
 // src/stores/commentCutter/actions/persistence.ts
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { createState } from '../state'
+import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 
 export const createPersistenceActions = (state: ReturnType<typeof createState>) => {
   const save = async (saveHandler?: (data: DataSchemaType) => Promise<void>) => {
@@ -11,9 +12,8 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
         state.electronStore.value.set(state.storeKey.value, state.data.value)
       }
       state.isDirty.value = false
-      state.lastError.value = null
     } catch (error) {
-      state.lastError.value = 'データの保存に失敗しました'
+      ConsolePost('error', `データの保存に失敗しました: ${error}`)
       throw error
     }
   }
@@ -26,7 +26,7 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
         console.log('Auto-saved plugin data')
       } catch (error) {
         console.error('Auto-save failed:', error)
-        state.lastError.value = '自動保存に失敗しました'
+        ConsolePost('error', `自動保存に失敗しました: ${error}`)
       }
     }
   }
@@ -41,7 +41,7 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
       state.isDirty.value = false
       console.log('Data persisted to file')
     } catch (error) {
-      state.lastError.value = 'ファイルへの保存に失敗しました'
+      ConsolePost('error', `ファイルへの保存に失敗しました: ${error}`)
       throw error
     }
   }
@@ -57,7 +57,7 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
       state.isDirty.value = false
       console.log('Data loaded from file')
     } catch (error) {
-      state.lastError.value = 'ファイルからの読み込みに失敗しました'
+      ConsolePost('error', `ファイルからの読み込みに失敗しました: ${error}`)
       throw error
     }
   }

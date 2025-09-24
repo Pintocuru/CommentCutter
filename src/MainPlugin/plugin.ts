@@ -7,7 +7,7 @@ import { useCommentCutterStore } from '@/stores/pluginStore'
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 import { createPinia } from 'pinia'
-import { OnePlugin, PluginResponse, PluginRequest, PluginAPI } from '@onecomme.com/onesdk/'
+import { OnePlugin, PluginResponse, PluginRequest, PluginAPI, Comment } from '@onecomme.com/onesdk/'
 
 // プラグイン専用のPiniaインスタンス
 const pluginPinia = createPinia()
@@ -31,7 +31,7 @@ const plugin: OnePlugin = {
       // Check if the data exists before proceeding
       if (!storeData || !storeData.target) {
         const errorMsg = 'ストアデータが見つからないか、形式が不正です。'
-        ConsolePost('error', errorMsg, SETTINGS.botName)
+        ConsolePost('error', errorMsg)
         throw new Error(errorMsg)
       }
 
@@ -42,7 +42,7 @@ const plugin: OnePlugin = {
       ConsolePost('info', `【コメントカッタープラグイン】がONだよ`)
     } catch (error) {
       console.error('Plugin initialization failed:', error)
-      ConsolePost('error', `プラグインの初期化に失敗しました: ${error}`, SETTINGS.botName)
+      ConsolePost('error', `プラグインの初期化に失敗しました: ${error}`)
       throw error
     }
   },
@@ -51,27 +51,43 @@ const plugin: OnePlugin = {
     try {
       const store = useCommentCutterStore(pluginPinia)
 
-      // TODO:コメントテスターであれば必ずtrue(commentを返す)
+      // コメントテスターであれば必ずcommentを返す
+      if (comment.id === 'COMMENT_TESTER') return comment
+
       if (!store.isInitialized || !store.hasActivePreset) {
         ConsolePost('error', `初期化されてないよ`)
         return comment
       }
 
+      // 条件がなければスルー
       const threshold = store.currentPreset?.threshold
-      if (!threshold) return comment
-
-      // マッチしたらfalse
-      const isMatched = checkAllConditions(comment, threshold)
-      if (isMatched) {
-        console.info(threshold, `test:弾かれたよ`)
-      } else {
-        console.info(threshold, `test:通ったよ`)
+      if (!threshold || threshold.conditions.length === 0) {
+        return comment
       }
 
-      return isMatched ? false : comment
+      const isMatched = checkAllConditions(comment, threshold)
+      console.info(threshold, `test:${isMatched ? '弾かれたよ' : '通ったよ'}`)
+
+      const { isBlacklist, isFilterSpeech } = store.currentPreset ?? {}
+
+      // スピーチ部分だけ消す処理をまとめる
+      const clearSpeech = (): Comment => {
+        comment.data.speechText = ''
+        return comment
+      }
+
+      // ブラックリスト方式
+      if (isBlacklist) {
+        if (isFilterSpeech && isMatched) return clearSpeech()
+        return isMatched ? false : comment
+      }
+
+      // ホワイトリスト方式
+      if (isFilterSpeech && !isMatched) return clearSpeech()
+      return isMatched ? comment : false
     } catch (error) {
       console.error('Filter comment error:', error)
-      ConsolePost('error', `フィルタリングエラー: ${error}`, SETTINGS.botName)
+      ConsolePost('error', `フィルタリングエラー: ${error}`)
       return comment
     }
   },
@@ -95,7 +111,7 @@ const plugin: OnePlugin = {
       console.error('Request handling error:', error)
       const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
-      ConsolePost('error', `エラーが発生しました: ${errorMessage}`, SETTINGS.botName)
+      ConsolePost('error', `エラーが発生しました: ${errorMessage}`)
 
       return {
         code: 500,

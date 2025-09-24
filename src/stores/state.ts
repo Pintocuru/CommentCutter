@@ -5,7 +5,6 @@ import { DataSchema, DataSchemaType } from '@/types/type'
 export const createState = () => ({
   data: ref<DataSchemaType>(DataSchema.parse({})),
   isInitialized: ref(false),
-  lastError: ref<string | null>(null),
   isDirty: ref(false),
   electronStore: ref<any>(null),
   storeKey: ref<string>('pluginData'),

@@ -38,7 +38,6 @@ export const useCommentCutterStore = defineStore('commentCutter', () => {
     // State (readonly)
     data: readonly(state.data),
     isInitialized: readonly(state.isInitialized),
-    lastError: readonly(state.lastError),
     isDirty: readonly(state.isDirty),
     isEditorMode: readonly(state.isEditorMode),
     selectedPresetId: readonly(state.selectedPresetId),

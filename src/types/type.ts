@@ -8,19 +8,21 @@ import { CutterThresholdSchema } from './CutterThresholdSchema'
  */
 export const PresetSchema = z.object({
   ...BaseSchema.shape,
+  isBlacklist: z.boolean().default(true), // 該当したら通さない（フィルター）
+  isFilterSpeech: z.boolean().default(false), // 該当したら読み上げだけフィルター
   threshold: CutterThresholdSchema.default(
     CutterThresholdSchema.parse({
       conditions: ['comment'],
       comment: ['おみくじ'],
     })
-  ).catch(CutterThresholdSchema.parse({})), // コメント発火条件
+  ).catch(CutterThresholdSchema.parse({ conditions: [] })), // コメント発火条件
 })
 
 /**
  * コメントカッタープラグインの全体の型
  */
 export const DataSchema = z.object({
-  target: z.string().default('omikuji').catch('omikuji'), // 使用するプリセットkey
+  target: z.string().default('').catch(''), // 空文字をデフォルトに
   presets: z.record(z.string(), PresetSchema).catch({}),
 })
 

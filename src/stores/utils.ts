@@ -9,7 +9,6 @@ export const createUtils = (state: ReturnType<typeof createState>, getters: any)
     isDirty: state.isDirty.value,
     selectedPresetId: state.selectedPresetId.value,
     currentPreset: getters.currentPreset.value,
-    lastError: state.lastError.value,
   })
 
   return { getDebugInfo }

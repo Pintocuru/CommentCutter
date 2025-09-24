@@ -138,7 +138,6 @@ function handleGetStatus(store: ReturnType<typeof useCommentCutterStore>): Plugi
         presetsCount: store.allPresets.length,
         target: store.data.target,
         isDirty: store.isDirty,
-        lastError: store.lastError,
       },
     }),
   }

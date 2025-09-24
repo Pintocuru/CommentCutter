@@ -1,6 +1,7 @@
 // src/stores/commentCutter/actions/core.ts
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { createState } from '../state'
+import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 
 export const createCoreActions = (state: ReturnType<typeof createState>) => {
   const setData = (newData: Partial<DataSchemaType>) => {
@@ -8,13 +9,12 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       const oldData = { ...state.data.value }
       state.data.value = DataSchema.parse({ ...state.data.value, ...newData })
       state.isDirty.value = true
-      state.lastError.value = null
 
       if (!state.isEditorMode.value) {
         console.log('Plugin data updated:', { oldData, newData: state.data.value })
       }
     } catch (error) {
-      state.lastError.value = error instanceof Error ? error.message : 'データの更新に失敗しました'
+      ConsolePost('error', `データの更新に失敗しました: ${error}`)
       console.error('Store update error:', error)
       throw error
     }
@@ -31,14 +31,13 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       state.isInitialized.value = true
       state.isEditorMode.value = editorMode
       state.isDirty.value = false
-      state.lastError.value = null
 
       if (apiStore) {
         state.electronStore.value = apiStore
         state.storeKey.value = storageKey
       }
     } catch (error) {
-      state.lastError.value = '初期化に失敗しました'
+      ConsolePost('error', `初期化に失敗しました: ${error}`)
       console.error('Store initialization error:', error)
       throw error
     }
@@ -53,12 +52,11 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       // データ全体を置き換え
       state.data.value = validatedData
       state.isDirty.value = true
-      state.lastError.value = null
 
       console.log('Store data updated successfully')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
-      state.lastError.value = `データの更新に失敗しました: ${errorMessage}`
+      ConsolePost('error', `データの更新に失敗しました: ${errorMessage}`)
       console.error('Store data update failed:', error)
       throw error
     }
@@ -74,12 +72,11 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
 
       state.data.value = validatedData
       state.isDirty.value = true
-      state.lastError.value = null
 
       console.log('Store data partially updated successfully')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
-      state.lastError.value = `データの部分更新に失敗しました: ${errorMessage}`
+      ConsolePost('error', `データの部分更新に失敗しました: ${errorMessage}`)
       console.error('Store data partial update failed:', error)
       throw error
     }
@@ -90,25 +87,19 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       const defaultData = DataSchema.parse({})
       state.data.value = defaultData
       state.isDirty.value = true
-      state.lastError.value = null
 
       console.log('Store data reset to default')
     } catch (error) {
-      state.lastError.value = 'データのリセットに失敗しました'
+      ConsolePost('error', `データのリセットに失敗しました: ${error}`)
       throw error
     }
-  }
-
-  const clearError = () => {
-    state.lastError.value = null
   }
 
   return {
     setData,
     initialize,
     reset,
-    clearError,
-    updateData, // 新規追加
-    updateDataPartial, // 新規追加
+    updateData,
+    updateDataPartial,
   }
 }

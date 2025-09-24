@@ -2,6 +2,7 @@
 import { PresetSchema, PresetType } from '@/types/type'
 import { createState } from '../state'
 import { createCoreActions } from './core'
+import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 
 export const createPresetActions = (
   state: ReturnType<typeof createState>,
@@ -23,7 +24,7 @@ export const createPresetActions = (
 
       return newPreset
     } catch (error) {
-      state.lastError.value = 'プリセットの追加に失敗しました'
+      ConsolePost('error', `プリセットの追加に失敗しました: ${error}`)
       throw error
     }
   }
@@ -45,7 +46,7 @@ export const createPresetActions = (
       }
       coreActions.setData({ presets: newPresets })
     } catch (error) {
-      state.lastError.value = 'プリセットの更新に失敗しました'
+      ConsolePost('error', `プリセットの更新に失敗しました: ${error}`)
       throw error
     }
   }
@@ -63,7 +64,7 @@ export const createPresetActions = (
         state.selectedPresetId.value = null
       }
     } catch (error) {
-      state.lastError.value = 'プリセットの削除に失敗しました'
+      ConsolePost('error', `プリセットの削除に失敗しました: ${error}`)
       throw error
     }
   }
@@ -83,7 +84,7 @@ export const createPresetActions = (
 
       return addPreset(duplicatedPreset)
     } catch (error) {
-      state.lastError.value = 'プリセットの複製に失敗しました'
+      ConsolePost('error', `プリセットの複製に失敗しました: ${error}`)
       throw error
     }
   }
@@ -91,7 +92,7 @@ export const createPresetActions = (
   const setActivePreset = (presetId: string) => {
     const preset = state.data.value.presets[presetId]
     if (!preset) {
-      state.lastError.value = '指定されたプリセットが見つかりません'
+      ConsolePost('error', `指定されたプリセットが見つかりません`)
       throw new Error('Preset not found')
     }
     coreActions.setData({ target: presetId })
