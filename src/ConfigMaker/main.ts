@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import ErrorHandler from '@shared/utils/ErrorHandler/ErrorHandler'
 import App from './App.vue'
 import '@shared/styles/DaisyUiDark.css'
+import OneSDK from '@onecomme.com/onesdk'
 
 async function initApp() {
   try {
@@ -12,7 +13,7 @@ async function initApp() {
 
     app.use(ErrorHandler)
     app.use(pinia)
-    app.mount('#App')
+    OneSDK.ready().then(() => app.mount('#App'))
   } catch (error) {
     console.error('アプリケーションの初期化に失敗:', error)
   }
