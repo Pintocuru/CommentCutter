@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import ErrorHandler from '@shared/utils/ErrorHandler/ErrorHandler'
 import App from './App.vue'
+import '@shared/styles/DaisyUiDark.css'
 
 async function initApp() {
   try {
