@@ -1,4 +1,4 @@
-// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\getHandler.ts
+// src\MainPlugin\services\getHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import { SETTINGS } from '@/types/settings'

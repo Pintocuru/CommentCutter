@@ -1,4 +1,4 @@
-// src/stores/commentCutter/actions/core.ts
+// src/stores/commentCutter/actions/pluginCore.ts
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { createState } from '../state'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'

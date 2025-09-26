@@ -1,16 +1,13 @@
 // src/MainPlugin/plugin.ts (Pinia統合版)
 import { SETTINGS } from '@/types/settings'
-import { DataSchema, DataSchemaType } from '@/types/type'
+import { DataSchema } from '@/types/type'
 import { handlePostRequest } from './services/postHandler'
 import { handleGetRequest } from './services/getHandler'
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
-import { createPinia } from 'pinia'
-import { OnePlugin, PluginResponse, PluginRequest, PluginAPI, Comment } from '@onecomme.com/onesdk/'
-
-// プラグイン専用のPiniaインスタンス
-const pluginPinia = createPinia()
+import { OnePlugin, PluginResponse, PluginRequest, Comment } from '@onecomme.com/onesdk/'
+import { ElectronStoreManager } from './store/ElectronStoreManager'
 
 const plugin: OnePlugin = {
   name: 'コメントカッタープラグイン CommentCutter',
@@ -22,21 +19,10 @@ const plugin: OnePlugin = {
 
   defaultState: DataSchema.parse({}),
 
-  async init(api: PluginAPI, initialData) {
+  async init(api, initialData) {
     try {
-      // ストアを初期化（プラグインモード）
-      const store = useCommentCutterStore(pluginPinia)
-      const storeData = api.store.store as DataSchemaType
-
-      // Check if the data exists before proceeding
-      if (!storeData || !storeData.target) {
-        const errorMsg = 'ストアデータが見つからないか、形式が不正です。'
-        ConsolePost('error', errorMsg)
-        throw new Error(errorMsg)
-      }
-
-      // api.storeの参照を渡して初期化
-      store.initialize(storeData, api.store, 'pluginData')
+      // init 内で一度だけ初期化
+      ElectronStoreManager.init(api.store)
 
       // プラグインの起動メッセージ
       ConsolePost('info', `【コメントカッタープラグイン】がONだよ`)
@@ -49,26 +35,20 @@ const plugin: OnePlugin = {
 
   async filterComment(comment, service, userData) {
     try {
-      const store = useCommentCutterStore(pluginPinia)
-
       // コメントテスターであれば必ずcommentを返す
       if (comment.id === 'COMMENT_TESTER') return comment
 
-      if (!store.isInitialized || !store.hasActivePreset) {
-        ConsolePost('error', `初期化されてないよ`)
-        return comment
-      }
+      const esm = ElectronStoreManager.getInstance()
+      const currentPreset = esm.currentPreset()
+      if (!currentPreset) return comment
+
+      const { threshold, isBlacklist, isFilterSpeech } = currentPreset
 
       // 条件がなければスルー
-      const threshold = store.currentPreset?.threshold
-      if (!threshold || threshold.conditions.length === 0) {
-        return comment
-      }
+      if (!threshold || threshold.conditions.length === 0) return comment
 
       const isMatched = checkAllConditions(comment, threshold)
       console.info(threshold, `test:${isMatched ? '弾かれたよ' : '通ったよ'}`)
-
-      const { isBlacklist, isFilterSpeech } = store.currentPreset ?? {}
 
       // スピーチ部分だけ消す処理をまとめる
       const clearSpeech = (): Comment => {
@@ -97,6 +77,9 @@ const plugin: OnePlugin = {
       const { method, url, body } = req
       const pathSegments = url.split('/').filter((segment) => segment !== '' && segment !== 'api')
 
+      const esm = ElectronStoreManager.getInstance()
+      const store = esm.getStore()
+
       if (method === 'POST') {
         return await handlePostRequest(body, pathSegments, pluginPinia)
       } else if (method === 'GET') {
@@ -121,14 +104,7 @@ const plugin: OnePlugin = {
   },
 
   destroy() {
-    try {
-      const store = useCommentCutterStore(pluginPinia)
-      // destroyメソッドで最終保存とクリーンアップ
-      store.destroy()
-      ConsolePost('info', '【コメントカッタープラグイン】がOFFだよ')
-    } catch (error) {
-      ConsolePost('error', 'Plugin destroy error:', error)
-    }
+    ConsolePost('info', '【コメントカッタープラグイン】がOFFだよ')
   },
 }
 
