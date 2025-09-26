@@ -1,42 +1,24 @@
-// src\MainPlugin\services\getHandler.ts
+// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\getHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
-import { useCommentCutterStore } from '@/stores/pluginStore'
-import { SETTINGS } from '@/types/settings'
+import { DataSchemaType } from '@/types/type'
+import ElectronStore from 'electron-store'
 
 export async function handleGetRequest(
   pathSegments: string[],
-  params: { [key: string]: string },
-  pluginPinia: any
+  params: Record<string, string>,
+  store: ElectronStore<DataSchemaType>
 ): Promise<PluginResponse> {
   try {
-    // ストアを取得
-    const store = useCommentCutterStore(pluginPinia)
-
-    if (!store.isInitialized) {
-      return {
-        code: 503,
-        response: JSON.stringify({ error: 'Store is not initialized' }),
-      }
-    }
-
     // パスによって処理を分岐
+    const storeData = store.get('store') as DataSchemaType
     const resource = pathSegments[0] || 'data'
 
     switch (resource) {
       case 'data':
-        return handleGetData(store)
-
-      case 'presets':
-        return handleGetPresets(store, pathSegments[1])
-
-      case 'preset':
-        return handleGetSpecificPreset(store, pathSegments[1] || params.id)
+        return handleGetData(storeData)
 
       case 'target':
-        return handleGetTarget(store)
-
-      case 'status':
-        return handleGetStatus(store)
+        return handleGetTarget(storeData)
 
       default:
         return {
@@ -56,88 +38,49 @@ export async function handleGetRequest(
 }
 
 // 全データ取得
-function handleGetData(store: ReturnType<typeof useCommentCutterStore>): PluginResponse {
+function handleGetData(data: DataSchemaType): PluginResponse {
   return {
     code: 200,
     response: JSON.stringify({
       success: true,
-      data: store.data,
-    }),
-  }
-}
-
-// プリセット一覧取得
-function handleGetPresets(store: ReturnType<typeof useCommentCutterStore>, filter?: string): PluginResponse {
-  let presets = store.allPresets
-
-  // フィルター適用
-  if (filter === 'active' && store.hasActivePreset) {
-    presets = store.currentPreset ? [store.currentPreset] : []
-  }
-
-  return {
-    code: 200,
-    response: JSON.stringify({
-      success: true,
-      presets: presets,
-      count: presets.length,
-    }),
-  }
-}
-
-// 特定のプリセット取得
-function handleGetSpecificPreset(store: ReturnType<typeof useCommentCutterStore>, presetId?: string): PluginResponse {
-  if (!presetId) {
-    return {
-      code: 400,
-      response: JSON.stringify({ error: 'Preset ID is required' }),
-    }
-  }
-
-  const preset = store.allPresets.find((p) => p.id === presetId)
-
-  if (!preset) {
-    return {
-      code: 404,
-      response: JSON.stringify({ error: 'Preset not found' }),
-    }
-  }
-
-  return {
-    code: 200,
-    response: JSON.stringify({
-      success: true,
-      preset: preset,
+      data,
     }),
   }
 }
 
 // アクティブターゲット取得
-function handleGetTarget(store: ReturnType<typeof useCommentCutterStore>): PluginResponse {
-  return {
-    code: 200,
-    response: JSON.stringify({
-      success: true,
-      target: store.data.target,
-      hasActivePreset: store.hasActivePreset,
-      currentPreset: store.currentPreset,
-    }),
-  }
-}
+function handleGetTarget(data: DataSchemaType): PluginResponse {
+  const targetKey = data.target
 
-// ステータス取得
-function handleGetStatus(store: ReturnType<typeof useCommentCutterStore>): PluginResponse {
+  // 有効なターゲットキーがない場合
+  if (!targetKey || targetKey === '') {
+    return {
+      code: 200,
+      response: JSON.stringify({
+        success: true,
+        data: null,
+      }),
+    }
+  }
+
+  const preset = data.presets[targetKey]
+
+  // プリセットが存在しない、または閾値が設定されていない場合
+  if (!preset || !preset.threshold) {
+    return {
+      code: 200,
+      response: JSON.stringify({
+        success: true,
+        data: null,
+      }),
+    }
+  }
+
   return {
     code: 200,
     response: JSON.stringify({
       success: true,
-      status: {
-        isInitialized: store.isInitialized,
-        hasPresets: store.hasPresets,
-        hasActivePreset: store.hasActivePreset,
-        presetsCount: store.allPresets.length,
-        target: store.data.target,
-      },
+      data: preset,
     }),
   }
 }

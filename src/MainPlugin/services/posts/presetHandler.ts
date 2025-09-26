@@ -1,12 +1,13 @@
-// src/MainPlugin/services/handlers/presetHandler.ts
+// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\posts\presetHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
 import { DataSchemaType } from '@/types/type'
 import { useCommentCutterStore } from '@/stores/pluginStore'
+import ElectronStore from 'electron-store'
 
 export async function handlePresetOperation(
-  store: ReturnType<typeof useCommentCutterStore>,
+  store: ElectronStore<DataSchemaType>,
   data: DataSchemaType,
   pathSegments: string[]
 ): Promise<PluginResponse> {
@@ -34,7 +35,7 @@ export async function handlePresetOperation(
 }
 
 async function handlePresetAddOrUpdate(
-  store: ReturnType<typeof useCommentCutterStore>,
+  store: ElectronStore<DataSchemaType>,
   data: DataSchemaType,
   operation: 'add' | 'update'
 ): Promise<PluginResponse> {
@@ -51,16 +52,14 @@ async function handlePresetAddOrUpdate(
   if (!updatedPreset) {
     throw new Error('No preset data provided or invalid preset key')
   }
+  const presetKeyPath = `presets.${presetId}`
+  store.set(presetKeyPath, updatedPreset)
 
   if (operation === 'add') {
-    store.addPreset(updatedPreset)
     postSystemMessage(`プリセット「${updatedPreset.name}」を追加しました`, SETTINGS.botName)
   } else {
-    store.updatePreset(updatedPreset.id, updatedPreset)
     postSystemMessage(`プリセット「${updatedPreset.name}」を更新しました`, SETTINGS.botName)
   }
-
-  await store.save()
 
   return {
     code: operation === 'add' ? 201 : 200,
@@ -72,17 +71,13 @@ async function handlePresetAddOrUpdate(
   }
 }
 
-async function handlePresetDelete(
-  store: ReturnType<typeof useCommentCutterStore>,
-  data: DataSchemaType
-): Promise<PluginResponse> {
+async function handlePresetDelete(store: ElectronStore<DataSchemaType>, data: DataSchemaType): Promise<PluginResponse> {
   if (!data.target) {
     throw new Error('No preset ID provided')
   }
 
-  store.removePreset(data.target)
-  await store.save()
-
+  const presetKeyPath = `presets.${data.target}`
+  store.delete(presetKeyPath as any)
   postSystemMessage(`プリセットを削除しました`, SETTINGS.botName)
 
   return {

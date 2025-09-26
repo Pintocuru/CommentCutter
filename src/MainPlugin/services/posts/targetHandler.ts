@@ -1,12 +1,12 @@
-// src/MainPlugin/services/handlers/targetHandler.ts
+// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\posts\targetHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
 import { DataSchemaType } from '@/types/type'
-import { useCommentCutterStore } from '@/stores/pluginStore'
+import ElectronStore from 'electron-store'
 
 export async function handleTargetUpdate(
-  store: ReturnType<typeof useCommentCutterStore>,
+  store: ElectronStore<DataSchemaType>,
   data: DataSchemaType
 ): Promise<PluginResponse> {
   try {
@@ -17,8 +17,7 @@ export async function handleTargetUpdate(
       }
     }
 
-    store.setActivePreset(data.target)
-    await store.save()
+    store.set('target', data.target)
 
     postSystemMessage(`アクティブプリセットを変更しました`, SETTINGS.botName)
 

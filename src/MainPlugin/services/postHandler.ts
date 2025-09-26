@@ -1,14 +1,18 @@
-// src/MainPlugin/services/postHandler.ts (メインハンドラー)
+// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\postHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
 import { DataSchema, DataSchemaType } from '@/types/type'
-import { useCommentCutterStore } from '@/stores/pluginStore'
 import { handleSaveData } from './posts/saveHandler'
 import { handlePresetOperation } from './posts/presetHandler'
 import { handleTargetUpdate } from './posts/targetHandler'
+import ElectronStore from 'electron-store'
 
-export async function handlePostRequest(body: any, pathSegments: string[], pluginPinia: any): Promise<PluginResponse> {
+export async function handlePostRequest(
+  body: any,
+  pathSegments: string[],
+  store: ElectronStore<DataSchemaType>
+): Promise<PluginResponse> {
   try {
     // bodyのバリデーション
     if (!body) {
@@ -33,16 +37,6 @@ export async function handlePostRequest(body: any, pathSegments: string[], plugi
     }
 
     const validatedData: DataSchemaType = validationResult.data
-
-    // ストアを取得
-    const store = useCommentCutterStore(pluginPinia)
-
-    if (!store.isInitialized) {
-      return {
-        code: 503,
-        response: JSON.stringify({ error: 'Store is not initialized' }),
-      }
-    }
 
     // パスによって処理を分岐
     const action = pathSegments[0] || 'save'

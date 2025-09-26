@@ -3,7 +3,6 @@ import { SETTINGS } from '@/types/settings'
 import { DataSchema } from '@/types/type'
 import { handlePostRequest } from './services/postHandler'
 import { handleGetRequest } from './services/getHandler'
-import { useCommentCutterStore } from '@/stores/pluginStore'
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 import { OnePlugin, PluginResponse, PluginRequest, Comment } from '@onecomme.com/onesdk/'
@@ -81,9 +80,9 @@ const plugin: OnePlugin = {
       const store = esm.getStore()
 
       if (method === 'POST') {
-        return await handlePostRequest(body, pathSegments, pluginPinia)
+        return await handlePostRequest(body, pathSegments, store)
       } else if (method === 'GET') {
-        return await handleGetRequest(pathSegments, req.params, pluginPinia)
+        return await handleGetRequest(pathSegments, req.params, store)
       }
 
       return {

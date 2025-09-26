@@ -45,7 +45,7 @@ export class ElectronStoreManager {
   currentPreset(): PresetType | null {
     const data = this.getData()
     const key = data.target
-    if (!key) return null
+    if (!key || key === '') return null
 
     const preset = data.presets[key]
     if (!preset || !preset.threshold) return null
