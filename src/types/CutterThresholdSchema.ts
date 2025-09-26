@@ -11,18 +11,6 @@ import {
 /**
  * コメントカッタープラグイン用Threshold
  */
-
-// 対象となるフィルタリングの値
-/**
- * comment: 'チャットワード',
- *  access: 'ユーザーの役職',
- * gift: 'ギフト',
- *  count: 'チャット数',
- * service: '配信プラットフォーム',
- * userId: 'ユーザーID',
- * username: 'ユーザー名',
- */
-
 export const CutterThresholdCondition = ['comment', 'access', 'gift', 'count', 'userId', 'username'] as const
 export type CutterThresholdCondition = (typeof CutterThresholdCondition)[number]
 

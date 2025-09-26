@@ -17,8 +17,6 @@ export const createEditorActions = (state: ReturnType<typeof createState>) => {
       }
 
       state.selectedPresetId.value = presetId
-      ConsolePost('info', `プリセット「${preset.name}」を選択しました`)
-      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセット選択に失敗しました: ${error}`
       ConsolePost('error', errorMessage)

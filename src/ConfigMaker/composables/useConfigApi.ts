@@ -21,6 +21,7 @@ export const useConfigApi = () => {
         const data = await fetchAppEditorData()
         config = {
           target: '',
+          theme: 'dark',
           presets: data.Presets || {},
         }
       }
@@ -54,6 +55,7 @@ export const useConfigApi = () => {
       // デモデータを返す
       return {
         target: '',
+        theme: 'dark',
         presets: {
           demo_preset: {
             id: 'demo_preset',

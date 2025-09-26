@@ -78,6 +78,14 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
     }
   }
 
+  const markAsSaved = () => {
+    state.hasChanged.value = false
+  }
+
+  const markAsChanged = () => {
+    state.hasChanged.value = true
+  }
+
   const destroy = async (): Promise<void> => {
     try {
       await autoSave()
@@ -94,6 +102,8 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
     load,
     loadPreset,
     getStatus,
+    markAsSaved,
+    markAsChanged,
     destroy,
   }
 }

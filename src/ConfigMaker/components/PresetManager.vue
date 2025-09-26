@@ -3,7 +3,7 @@
   <div class="space-y-4">
     <!-- プリセット追加ボタン -->
     <div class="flex justify-between items-center">
-      <button @click="handleAddNewPreset" class="btn btn-primary btn-sm">新しいプリセットを追加</button>
+      <button @click="addNewPreset" class="btn btn-primary btn-sm">新しいプリセットを追加</button>
     </div>
 
     <!-- プリセットがない場合 -->
@@ -24,16 +24,8 @@
   import PresetTabs from './PresetTabs.vue'
   import PresetEditor from './PresetEditor.vue'
   import { useCommentCutterStore } from '../../stores/pluginStore'
-  import { usePresetOperations } from '../composables/usePresetOperations.ts'
+  import { usePresetOperations } from '../composables/usePresetOperations'
 
   const store = useCommentCutterStore()
   const { addNewPreset } = usePresetOperations()
-
-  const handleAddNewPreset = async () => {
-    try {
-      await addNewPreset()
-    } catch (error) {
-      console.error('Failed to add preset:', error)
-    }
-  }
 </script>

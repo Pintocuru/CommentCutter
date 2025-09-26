@@ -1,6 +1,6 @@
 <!-- src/configMaker/App.vue -->
 <template>
-  <div class="p-4 max-w-6xl min-w-xl pb-64 overflow-x-hidden mx-auto" :data-theme="store.data.theme">
+  <div class="p-4 max-w-6xl min-w-xl pb-64 overflow-x-hidden mx-auto" :data-theme="data.theme">
     <!-- タイトル -->
     <AppHeader />
 
@@ -23,11 +23,16 @@
   import DebugInfo from './components/DebugInfo.vue'
   import { useCommentCutterStore } from '../stores/pluginStore'
   import { useConfigApi } from './composables/useConfigApi'
+  import { useAutoSave } from './composables/useAutoSave'
+  import { storeToRefs } from 'pinia'
 
   const store = useCommentCutterStore()
+  const { data } = storeToRefs(store)
   const configApi = useConfigApi()
+  const { setupAutoSave, forceSave } = useAutoSave()
 
   // 初期化処理
+
   onMounted(async () => {
     try {
       await configApi.initializeConfig()
@@ -37,6 +42,9 @@
       if (presetKeys.length > 0) {
         store.selectPreset(presetKeys[0])
       }
+
+      // 自動保存を設定
+      setupAutoSave()
     } catch (error) {
       console.error('Failed to initialize app:', error)
     }
@@ -44,10 +52,9 @@
 
   // クリーンアップ処理
   onUnmounted(async () => {
-    try {
-      await store.destroy()
-    } catch (error) {
-      console.error('Failed to cleanup app:', error)
+    // 未保存があれば強制保存してからクリーンアップ
+    if (store.hasChanged) {
+      await forceSave()
     }
   })
 </script>

@@ -13,19 +13,20 @@ export const createPresetActions = (
       // スキーマでバリデーションしつつデフォルト値を適用
       const newPreset = PresetSchema.parse({
         ...raw,
-        key: raw.key || raw.id || `preset_${Date.now()}`,
+        key: raw.key || raw.id || `${Date.now()}`,
+        name: raw.name || `プリセット${Object.keys(state.data.value.presets).length + 1}`,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       })
 
       const newPresets = {
         ...state.data.value.presets,
-        [newPreset.id]: newPreset,
+        [newPreset.key]: newPreset,
       }
       coreActions.setData({ presets: newPresets })
 
       // 追加したプリセットを選択状態にする
-      state.selectedPresetId.value = newPreset.id
+      state.selectedPresetId.value = newPreset.key
 
       ConsolePost('info', `プリセット「${newPreset.name}」を追加しました`)
       state.hasChanged.value = true
@@ -37,11 +38,11 @@ export const createPresetActions = (
     }
   }
 
-  const updatePreset = (presetId: string, updates: Partial<PresetType>) => {
+  const updatePreset = (key: string, updates: Partial<PresetType>) => {
     try {
-      const original = state.data.value.presets[presetId]
+      const original = state.data.value.presets[key]
       if (!original) {
-        throw new Error(`プリセット（ID: ${presetId}）が見つかりません`)
+        throw new Error(`プリセット（ID: ${key}）が見つかりません`)
       }
 
       const updated: PresetType = {
@@ -55,10 +56,9 @@ export const createPresetActions = (
 
       const newPresets = {
         ...state.data.value.presets,
-        [presetId]: validatedPreset,
+        [key]: validatedPreset,
       }
       coreActions.setData({ presets: newPresets })
-      ConsolePost('info', `プリセット「${validatedPreset.name}」を更新しました`)
       state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセットの更新に失敗しました: ${error}`
@@ -67,23 +67,23 @@ export const createPresetActions = (
     }
   }
 
-  const removePreset = (presetId: string) => {
+  const removePreset = (key: string) => {
     try {
-      const presetToRemove = state.data.value.presets[presetId]
+      const presetToRemove = state.data.value.presets[key]
       if (!presetToRemove) {
-        throw new Error(`プリセット（ID: ${presetId}）が見つかりません`)
+        throw new Error(`プリセット（ID: ${key}）が見つかりません`)
       }
 
-      const { [presetId]: _, ...rest } = state.data.value.presets
+      const { [key]: _, ...rest } = state.data.value.presets
       coreActions.setData({ presets: rest })
 
       // アクティブなプリセットが削除された場合はクリア
-      if (state.data.value.target === presetId) {
+      if (state.data.value.target === key) {
         coreActions.setData({ target: '' })
       }
 
       // 選択中のプリセットが削除された場合はクリア
-      if (state.selectedPresetId.value === presetId) {
+      if (state.selectedPresetId.value === key) {
         state.selectedPresetId.value = null
       }
 
@@ -96,18 +96,18 @@ export const createPresetActions = (
     }
   }
 
-  const duplicatePreset = (presetId: string) => {
+  const duplicatePreset = (key: string) => {
     try {
-      const originalPreset = state.data.value.presets[presetId]
+      const originalPreset = state.data.value.presets[key]
       if (!originalPreset) {
-        throw new Error(`プリセット（ID: ${presetId}）が見つかりません`)
+        throw new Error(`プリセット（ID: ${key}）が見つかりません`)
       }
 
       const duplicatedPreset = {
         ...originalPreset,
-        id: `${presetId}_copy_${Date.now()}`,
-        name: `${originalPreset.name} のコピー`,
+        id: `${key}_copy_${Date.now()}`,
         key: `${originalPreset.key}_copy_${Date.now()}`,
+        name: `${originalPreset.name} のコピー`,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
@@ -123,14 +123,14 @@ export const createPresetActions = (
     }
   }
 
-  const setActivePreset = (presetId: string) => {
+  const setActivePreset = (key: string) => {
     try {
-      const preset = state.data.value.presets[presetId]
+      const preset = state.data.value.presets[key]
       if (!preset) {
-        throw new Error(`指定されたプリセット（ID: ${presetId}）が見つかりません`)
+        throw new Error(`指定されたプリセット（ID: ${key}）が見つかりません`)
       }
 
-      coreActions.setData({ target: presetId })
+      coreActions.setData({ target: key })
       ConsolePost('info', `アクティブプリセットを「${preset.name}」に設定しました`)
       state.hasChanged.value = true
     } catch (error) {
@@ -168,29 +168,24 @@ export const createPresetActions = (
       }
     }
 
-    // 説明の長さチェック
-    if (preset.description && preset.description.length > 200) {
-      errors.push('説明は200文字以内で入力してください')
-    }
-
     // threshold の基本検証
     if (preset.threshold && !preset.threshold.conditions) {
-      errors.push('発火条件が正しく設定されていません')
+      errors.push('発動条件が正しく設定されていません')
     }
 
     return errors
   }
 
   // プリセットの並び替え機能
-  const reorderPresets = (presetIds: string[]) => {
+  const reorderPresets = (presetKeys: string[]) => {
     try {
       const currentPresets = state.data.value.presets
       const reorderedPresets: Record<string, PresetType> = {}
 
       // 指定された順序で再構築
-      presetIds.forEach((id) => {
-        if (currentPresets[id]) {
-          reorderedPresets[id] = currentPresets[id]
+      presetKeys.forEach((key) => {
+        if (currentPresets[key]) {
+          reorderedPresets[key] = currentPresets[key]
         }
       })
 

@@ -2,7 +2,7 @@
 <template>
   <div v-if="store.selectedPreset" class="card bg-base-200 mt-4">
     <!-- カードヘッダー -->
-    <PresetEditorHeader @duplicate="handleDuplicate" @delete="handleDelete" />
+    <PresetEditorHeader @duplicate="duplicateCurrentPreset" @delete="deleteCurrentPreset" />
 
     <div class="card-body space-y-4">
       <!-- バリデーションエラー表示 -->
@@ -22,7 +22,6 @@
   import PresetEditorHeader from './PresetEditorHeader.vue'
   import ValidationErrors from './ValidationErrors.vue'
   import BasicSettings from './BasicSettings.vue'
-  import PresetOptionSettings from './PresetOptionSettings.vue'
   import PresetThresholdSettings from './PresetThresholdSettings.vue'
   import { useCommentCutterStore } from '../../stores/pluginStore'
   import { usePresetOperations } from '../composables/usePresetOperations'
@@ -35,20 +34,4 @@
     if (!store.selectedPreset) return []
     return store.validatePreset(store.selectedPreset)
   })
-
-  const handleDuplicate = async () => {
-    try {
-      await duplicateCurrentPreset()
-    } catch (error) {
-      console.error('Failed to duplicate preset:', error)
-    }
-  }
-
-  const handleDelete = async () => {
-    try {
-      await deleteCurrentPreset()
-    } catch (error) {
-      console.error('Failed to delete preset:', error)
-    }
-  }
 </script>
