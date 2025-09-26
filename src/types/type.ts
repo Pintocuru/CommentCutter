@@ -24,6 +24,7 @@ export const PresetSchema = z.object({
 export const DataSchema = z.object({
   target: z.string().default('').catch(''), // 空文字をデフォルトに
   presets: z.record(z.string(), PresetSchema).catch({}),
+  theme: z.enum(['light', 'dark']).default('dark'), // UIテーマ
 })
 
 export type DataSchemaType = z.infer<typeof DataSchema>

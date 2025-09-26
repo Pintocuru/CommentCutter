@@ -1,27 +1,28 @@
-// src/stores/commentCutter/actions/persistence.ts
-import { DataSchema, DataSchemaType } from '@/types/type'
+// src\stores\actions\persistence.ts
+import { DataSchema } from '@/types/type'
 import { createState } from '../state'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 
 export const createPersistenceActions = (state: ReturnType<typeof createState>) => {
-  const save = async (saveHandler?: (data: DataSchemaType) => Promise<void>) => {
+  const save = async (resource: string = 'save'): Promise<void> => {
+    if (!state.apiClient.value) {
+      throw new Error('API client is not available')
+    }
+
     try {
-      if (saveHandler) {
-        await saveHandler(state.data.value)
-      } else if (state.electronStore.value) {
-        state.electronStore.value.set(state.storeKey.value, state.data.value)
-      }
+      await state.apiClient.value.post(resource, state.data.value)
+      ConsolePost('info', 'データを保存しました')
     } catch (error) {
       ConsolePost('error', `データの保存に失敗しました: ${error}`)
       throw error
     }
   }
 
-  const autoSave = async () => {
-    if (state.electronStore.value) {
+  const autoSave = async (): Promise<void> => {
+    if (state.apiClient.value && state.isInitialized.value) {
       try {
-        state.electronStore.value.set(state.storeKey.value, state.data.value)
-        console.log('Auto-saved plugin data')
+        await state.apiClient.value.post('save', state.data.value)
+        console.log('Auto-saved data via API')
       } catch (error) {
         console.error('Auto-save failed:', error)
         ConsolePost('error', `自動保存に失敗しました: ${error}`)
@@ -29,43 +30,58 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
     }
   }
 
-  const persistToFile = async () => {
-    if (!state.electronStore.value) {
-      throw new Error('electron-store is not available')
+  const load = async (resource: string = 'data'): Promise<void> => {
+    if (!state.apiClient.value) {
+      throw new Error('API client is not available')
     }
 
     try {
-      state.electronStore.value.set(state.storeKey.value, state.data.value)
-      console.log('Data persisted to file')
-    } catch (error) {
-      ConsolePost('error', `ファイルへの保存に失敗しました: ${error}`)
-      throw error
-    }
-  }
-
-  const loadFromFile = () => {
-    if (!state.electronStore.value) {
-      throw new Error('electron-store is not available')
-    }
-
-    try {
-      const savedData = state.electronStore.value.get(state.storeKey.value, {})
+      const savedData = await state.apiClient.value.get(resource)
       state.data.value = DataSchema.parse(savedData)
-      console.log('Data loaded from file')
+      ConsolePost('info', 'データを読み込みました')
     } catch (error) {
-      ConsolePost('error', `ファイルからの読み込みに失敗しました: ${error}`)
+      ConsolePost('error', `データの読み込みに失敗しました: ${error}`)
       throw error
     }
   }
 
-  const destroy = async () => {
+  // 特定のプリセットを取得
+  const loadPreset = async (presetId: string) => {
+    if (!state.apiClient.value) {
+      throw new Error('API client is not available')
+    }
+
+    try {
+      const response = await state.apiClient.value.get(`preset/${presetId}`)
+      if (response.success && response.preset) {
+        return response.preset
+      }
+      throw new Error('Preset not found')
+    } catch (error) {
+      ConsolePost('error', `プリセットの読み込みに失敗しました: ${error}`)
+      throw error
+    }
+  }
+
+  // ステータス取得
+  const getStatus = async () => {
+    if (!state.apiClient.value) {
+      throw new Error('API client is not available')
+    }
+
+    try {
+      const response = await state.apiClient.value.get('status')
+      return response.status
+    } catch (error) {
+      ConsolePost('error', `ステータス取得に失敗しました: ${error}`)
+      throw error
+    }
+  }
+
+  const destroy = async (): Promise<void> => {
     try {
       await autoSave()
-
-      // reset処理は外部から呼び出す
-      state.electronStore.value = null
-      state.storeKey.value = 'pluginData'
-
+      state.apiClient.value = null
       console.log('Store destroyed and cleaned up')
     } catch (error) {
       console.error('Store destroy error:', error)
@@ -75,8 +91,9 @@ export const createPersistenceActions = (state: ReturnType<typeof createState>) 
   return {
     save,
     autoSave,
-    persistToFile,
-    loadFromFile,
+    load,
+    loadPreset,
+    getStatus,
     destroy,
   }
 }

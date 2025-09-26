@@ -1,6 +1,6 @@
+// src\stores\utils.ts
 import { createState } from './state'
 
-// src/stores/commentCutter/utils.ts
 export const createUtils = (state: ReturnType<typeof createState>, getters: any) => {
   const getDebugInfo = () => ({
     data: state.data.value,

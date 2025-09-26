@@ -1,4 +1,4 @@
-// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\posts\saveHandler.ts
+// src\MainPlugin\services\posts\saveHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'

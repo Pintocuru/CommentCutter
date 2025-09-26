@@ -1,8 +1,8 @@
-// src/stores/commentCutter/actions/pluginCore.ts
+// src\stores\actions\pluginCore.ts
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { createState } from '../state'
+import { ApiClient } from '../../api/OneSdkApiClient'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
-import ElectronStore from 'electron-store'
 
 export const createCoreActions = (state: ReturnType<typeof createState>) => {
   const setData = (newData: Partial<DataSchemaType>) => {
@@ -15,40 +15,26 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     }
   }
 
-  const initialize = (
-    initialData: DataSchemaType,
-    apiStore?: ElectronStore<Record<string, unknown>>,
-    storageKey = 'pluginData'
-  ) => {
+  const initialize = async (apiClient: DataSchemaType) => {
     try {
-      // 💡 元データを壊さないためにクローン
-      const cloned = JSON.parse(JSON.stringify(initialData ?? {}))
-
-      // 💡 スキーマで補完しつつ parse
-      state.data.value = DataSchema.parse(cloned)
-
+      state.data.value = apiClient
       state.isInitialized.value = true
 
-      if (apiStore) {
-        state.electronStore.value = apiStore
-        state.storeKey.value = storageKey
-      }
+      ConsolePost('info', 'ストアの初期化が完了しました')
     } catch (error) {
-      ConsolePost('error', `初期化に失敗しました: ${error}`)
-      console.error('Store initialization error:', error)
-      throw error
+      // 初期化エラーの場合はデフォルトデータで初期化を続行
+      console.warn('Failed to load data from API, using default data:', error)
+      state.data.value = DataSchema.parse({})
+      state.isInitialized.value = true
+
+      ConsolePost('warn', 'デフォルトデータでストアを初期化しました')
     }
   }
 
-  // 新しく追加するメソッド
   const updateData = (newData: DataSchemaType) => {
     try {
-      // DataSchemaでバリデーション
       const validatedData = DataSchema.parse(newData)
-
-      // データ全体を置き換え
       state.data.value = validatedData
-
       console.log('Store data updated successfully')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
@@ -58,16 +44,11 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     }
   }
 
-  // データの部分更新（既存のsetDataと似ているが、より安全）
   const updateDataPartial = (updates: Partial<DataSchemaType>) => {
     try {
       const newData = { ...state.data.value, ...updates }
-
-      // 部分更新でもバリデーションを行う
       const validatedData = DataSchema.parse(newData)
-
       state.data.value = validatedData
-
       console.log('Store data partially updated successfully')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown validation error'
@@ -81,10 +62,31 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     try {
       const defaultData = DataSchema.parse({})
       state.data.value = defaultData
-
+      state.hasChanged.value = true
       console.log('Store data reset to default')
     } catch (error) {
       ConsolePost('error', `データのリセットに失敗しました: ${error}`)
+      throw error
+    }
+  }
+
+  const syncFromApi = async (resource: string = 'data') => {
+    if (!state.apiClient.value) {
+      throw new Error('API client is not available')
+    }
+
+    try {
+      const apiData = await state.apiClient.value.get(resource)
+
+      if (resource === 'data') {
+        const validatedData = DataSchema.parse(apiData)
+        state.data.value = validatedData
+        ConsolePost('info', 'APIからデータを同期しました')
+      }
+
+      return apiData
+    } catch (error) {
+      ConsolePost('error', `API同期に失敗しました: ${error}`)
       throw error
     }
   }
@@ -95,5 +97,6 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     reset,
     updateData,
     updateDataPartial,
+    syncFromApi,
   }
 }

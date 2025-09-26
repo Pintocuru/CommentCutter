@@ -1,4 +1,4 @@
-// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\postHandler.ts
+// src\MainPlugin\services\postHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
@@ -42,10 +42,11 @@ export async function handlePostRequest(
     const action = pathSegments[0] || 'save'
 
     switch (action) {
+      // 基本こっちしか使わない
       case 'save':
-      case 'update':
         return await handleSaveData(store, validatedData)
 
+      // 以下は削除検討
       case 'preset':
         return await handlePresetOperation(store, validatedData, pathSegments)
 

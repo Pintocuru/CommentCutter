@@ -1,4 +1,4 @@
-// src/stores/commentCutter/getters.ts
+// src\stores\getters.ts
 import { computed } from 'vue'
 import { createState } from './state'
 
@@ -23,9 +23,9 @@ export const createGetters = (state: ReturnType<typeof createState>) => ({
 
     return preset
   }),
-// プリセットを配列にしたもの（必要かな？）
+  // プリセットを配列にしたもの（必要かな？）
   allPresets: computed(() => Object.values(state.data.value.presets)),
-// 設定の数
+  // 設定の数
   hasPresets: computed(() => Object.keys(state.data.value.presets).length > 0),
 
   // ？

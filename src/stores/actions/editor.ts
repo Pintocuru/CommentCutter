@@ -1,4 +1,4 @@
-// src/stores/commentCutter/actions/editor.ts
+// src\stores\actions\editor.ts
 import { createState } from '../state'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
 
@@ -18,6 +18,7 @@ export const createEditorActions = (state: ReturnType<typeof createState>) => {
 
       state.selectedPresetId.value = presetId
       ConsolePost('info', `プリセット「${preset.name}」を選択しました`)
+      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセット選択に失敗しました: ${error}`
       ConsolePost('error', errorMessage)
@@ -28,43 +29,14 @@ export const createEditorActions = (state: ReturnType<typeof createState>) => {
   // エディターの状態管理
   const editorState = {
     // エディターのUIテーマを管理
-    setTheme: (theme: 'light' | 'dark' | 'auto') => {
-      // 実装は必要に応じて
+    setTheme: (theme: 'light' | 'dark') => {
+      state.data.value.theme = theme
       ConsolePost('info', `エディターテーマを${theme}に設定しました`)
     },
-
-    // エディターの表示モードを管理
-    setViewMode: (mode: 'simple' | 'advanced') => {
-      // 実装は必要に応じて
-      ConsolePost('info', `エディター表示モードを${mode}に設定しました`)
-    },
-
-    // フィルター設定など
-    setFilter: (filter: string) => {
-      // 実装は必要に応じて
-      ConsolePost('info', `エディターフィルターを設定しました: ${filter}`)
-    },
-  }
-
-  // プリセット編集の履歴管理（将来の機能拡張用）
-  const history = {
-    undo: () => {
-      // 実装は必要に応じて
-      ConsolePost('info', 'Undo機能は未実装です')
-    },
-
-    redo: () => {
-      // 実装は必要に応じて
-      ConsolePost('info', 'Redo機能は未実装です')
-    },
-
-    canUndo: () => false,
-    canRedo: () => false,
   }
 
   return {
     selectPreset,
     editorState,
-    history,
   }
 }

@@ -1,4 +1,4 @@
-// src/stores/commentCutter/actions/presets.ts
+// src\stores\actions\presets.ts
 import { PresetSchema, PresetType } from '@/types/type'
 import { createState } from '../state'
 import { createCoreActions } from './pluginCore'
@@ -28,6 +28,7 @@ export const createPresetActions = (
       state.selectedPresetId.value = newPreset.id
 
       ConsolePost('info', `プリセット「${newPreset.name}」を追加しました`)
+      state.hasChanged.value = true
       return newPreset
     } catch (error) {
       const errorMessage = `プリセットの追加に失敗しました: ${error}`
@@ -57,8 +58,8 @@ export const createPresetActions = (
         [presetId]: validatedPreset,
       }
       coreActions.setData({ presets: newPresets })
-
       ConsolePost('info', `プリセット「${validatedPreset.name}」を更新しました`)
+      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセットの更新に失敗しました: ${error}`
       ConsolePost('error', errorMessage)
@@ -87,6 +88,7 @@ export const createPresetActions = (
       }
 
       ConsolePost('info', `プリセット「${presetToRemove.name}」を削除しました`)
+      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセットの削除に失敗しました: ${error}`
       ConsolePost('error', errorMessage)
@@ -112,6 +114,7 @@ export const createPresetActions = (
 
       const newPreset = addPreset(duplicatedPreset)
       ConsolePost('info', `プリセット「${originalPreset.name}」を複製しました`)
+      state.hasChanged.value = true
       return newPreset
     } catch (error) {
       const errorMessage = `プリセットの複製に失敗しました: ${error}`
@@ -129,6 +132,7 @@ export const createPresetActions = (
 
       coreActions.setData({ target: presetId })
       ConsolePost('info', `アクティブプリセットを「${preset.name}」に設定しました`)
+      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `アクティブプリセットの設定に失敗しました: ${error}`
       ConsolePost('error', errorMessage)
@@ -139,6 +143,7 @@ export const createPresetActions = (
   const clearActivePreset = () => {
     coreActions.setData({ target: '' })
     ConsolePost('info', 'アクティブプリセットをクリアしました')
+    state.hasChanged.value = true
   }
 
   const validatePreset = (preset: Partial<PresetType>): string[] => {
@@ -191,6 +196,7 @@ export const createPresetActions = (
 
       coreActions.setData({ presets: reorderedPresets })
       ConsolePost('info', 'プリセットの並び順を更新しました')
+      state.hasChanged.value = true
     } catch (error) {
       const errorMessage = `プリセットの並び替えに失敗しました: ${error}`
       ConsolePost('error', errorMessage)

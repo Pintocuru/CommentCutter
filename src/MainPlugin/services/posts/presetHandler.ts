@@ -1,9 +1,8 @@
-// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\MainPlugin\services\posts\presetHandler.ts
+// src\MainPlugin\services\posts\presetHandler.ts
 import { PluginResponse } from '@onecomme.com/onesdk/'
 import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
 import { DataSchemaType } from '@/types/type'
-import { useCommentCutterStore } from '@/stores/pluginStore'
 import ElectronStore from 'electron-store'
 
 export async function handlePresetOperation(

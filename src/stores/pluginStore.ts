@@ -1,5 +1,5 @@
-// src/stores/pluginStore.ts
-import { readonly } from 'vue'
+// src\stores\pluginStore.ts
+import { readonly, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { createState } from './state'
 import { createGetters } from './getters'
@@ -19,22 +19,10 @@ export const useCommentCutterStore = defineStore('commentCutter', () => {
   const persistenceActions = createPersistenceActions(state)
   const utils = createUtils(state, getters)
 
-  // destroy処理は複数のアクションを組み合わせる必要があるため、ここで定義
-  const destroy = async () => {
-    try {
-      await persistenceActions.autoSave()
-      coreActions.reset()
-      state.electronStore.value = null
-      state.storeKey.value = 'pluginData'
-      console.log('Store destroyed and cleaned up')
-    } catch (error) {
-      console.error('Store destroy error:', error)
-    }
-  }
-
   return {
     // State (readonly)
     data: readonly(state.data),
+    hasChanged: state.hasChanged,
     isInitialized: readonly(state.isInitialized),
     selectedPresetId: readonly(state.selectedPresetId),
 
@@ -47,6 +35,5 @@ export const useCommentCutterStore = defineStore('commentCutter', () => {
     ...editorActions,
     ...persistenceActions,
     ...utils,
-    destroy,
   }
 })
