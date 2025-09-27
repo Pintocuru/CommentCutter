@@ -20,7 +20,7 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
       state.data.value = apiClient
       state.isInitialized.value = true
 
-      ConsolePost('info', 'ストアの初期化が完了しました')
+      ConsolePost('info', 'ストアを読み込みました')
     } catch (error) {
       // 初期化エラーの場合はデフォルトデータで初期化を続行
       console.warn('Failed to load data from API, using default data:', error)

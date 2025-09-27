@@ -1,6 +1,6 @@
 /* shared/styles/DaisyUi.css */
 @import 'tailwindcss';
-@source "../../**/*.{html,js,ts,jsx,tsx,vue}";
+@source "../../../../**/*.{html,js,ts,jsx,tsx,vue}";
 
 @plugin "daisyui" {
   themes:
