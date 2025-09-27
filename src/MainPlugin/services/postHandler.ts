@@ -4,14 +4,13 @@ import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 import { SETTINGS } from '@/types/settings'
 import { DataSchema, DataSchemaType } from '@/types/type'
 import { handleSaveData } from './posts/saveHandler'
-import { handlePresetOperation } from './posts/presetHandler'
-import { handleTargetUpdate } from './posts/targetHandler'
 import ElectronStore from 'electron-store'
 
 export async function handlePostRequest(
   body: any,
   pathSegments: string[],
-  store: ElectronStore<DataSchemaType>
+  store: ElectronStore<DataSchemaType>,
+  params: Record<string, string>
 ): Promise<PluginResponse> {
   try {
     // bodyのバリデーション
@@ -39,19 +38,12 @@ export async function handlePostRequest(
     const validatedData: DataSchemaType = validationResult.data
 
     // パスによって処理を分岐
-    const action = pathSegments[0] || 'save'
+    const action = params.type || 'save'
 
     switch (action) {
       // 基本こっちしか使わない
       case 'save':
         return await handleSaveData(store, validatedData)
-
-      // 以下は削除検討
-      case 'preset':
-        return await handlePresetOperation(store, validatedData, pathSegments)
-
-      case 'target':
-        return await handleTargetUpdate(store, validatedData)
 
       default:
         return {

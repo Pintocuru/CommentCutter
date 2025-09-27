@@ -36,8 +36,22 @@ export class ElectronStoreManager {
 
   // 最新の storeData を常に返す
   getData(): DataSchemaType {
-    const raw = this.electronStore.get('store')
-    // バリデーションして型保証
+    // ストア全体を取得
+    let raw = this.electronStore.store
+
+    // raw が undefined の場合 (ストアが空の場合) に備え、安全策として {} を適用
+    if (raw === undefined || Object.keys(raw).length === 0) {
+      // Zodのデフォルト値で初期データを生成
+      const defaultData = DataSchema.parse({})
+
+      // 永続化: .store を直接上書きする (Electron Storeの仕様による)
+      this.electronStore.store = defaultData
+
+      raw = defaultData
+      ConsolePost('info', `[ESM Init] Store was empty. Zod defaults saved.`)
+    }
+
+    // 有効なオブジェクトをパース
     return DataSchema.parse(raw)
   }
 

@@ -2,6 +2,7 @@
 
 // 環境変数があるなら開発、そうでないなら本番
 export const isDev = import.meta.env?.VITE_IS_DEV || false
+export const isRealApi = import.meta.env?.VITE_IS_REAL_API || true
 
 // プラグインのUID
 const PLUGIN_UID_DEFAULT = 'CommentCutter'

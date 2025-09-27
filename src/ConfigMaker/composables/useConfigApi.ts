@@ -2,7 +2,7 @@
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import type { DataSchemaType } from '@/types/type'
 import { OneSdkApiClient } from '@/api/OneSdkApiClient'
-import { isDev, SETTINGS } from '@/types/settings'
+import { isDev, isRealApi, SETTINGS } from '@/types/settings'
 
 export const useConfigApi = () => {
   const store = useCommentCutterStore()
@@ -14,16 +14,12 @@ export const useConfigApi = () => {
       let config: DataSchemaType
 
       // 環境に応じてAPIを切り替え
-      if (isDev) {
+      if (isDev && !isRealApi) {
         config = await mockEditorApi.loadConfig()
       } else {
         // 本番環境では実際のAPIを使用
         const data = await fetchAppEditorData()
-        config = {
-          target: '',
-          theme: 'dark',
-          presets: data.Presets || {},
-        }
+        config = data
       }
 
       store.initialize(config)
@@ -35,13 +31,10 @@ export const useConfigApi = () => {
   }
 
   // データフェッチ関数
-  const fetchAppEditorData = async (): Promise<any> => {
+  const fetchAppEditorData = async (): Promise<DataSchemaType> => {
     try {
-      const response = await ApiClient.get('data')
-      const data = JSON.parse(response)
-      return {
-        Presets: data.Presets,
-      }
+      const data = await ApiClient.get('data')
+      return data
     } catch (error) {
       console.error('Failed to fetch app editor data:', error)
       throw error
@@ -84,7 +77,7 @@ export const useConfigApi = () => {
   // 設定の保存
   const saveConfig = async () => {
     try {
-      if (isDev) {
+      if (isDev && !isRealApi) {
         // 開発環境なら告知のみ
         await mockEditorApi.saveConfig(store.data)
       } else {

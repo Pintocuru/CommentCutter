@@ -80,7 +80,7 @@ const plugin: OnePlugin = {
       const store = esm.getStore()
 
       if (method === 'POST') {
-        return await handlePostRequest(body, pathSegments, store)
+        return await handlePostRequest(body, pathSegments, store, req.params)
       } else if (method === 'GET') {
         return await handleGetRequest(pathSegments, req.params, store)
       }

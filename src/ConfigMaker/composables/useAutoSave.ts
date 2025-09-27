@@ -2,7 +2,7 @@
 import { watch, ref, onUnmounted } from 'vue'
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import { useConfigApi } from './useConfigApi'
-import { isDev } from '@/types/settings'
+import { isDev, isRealApi } from '@/types/settings'
 
 export const useAutoSave = () => {
   const store = useCommentCutterStore()
@@ -22,7 +22,7 @@ export const useAutoSave = () => {
     try {
       isSaving.value = true
 
-      if (isDev) {
+      if (isDev && !isRealApi) {
         console.log('🔄 Auto-save triggered (dev mode - no actual API call)')
         // 開発環境でも少し遅延を入れて実際の保存をシミュレート
         await new Promise((resolve) => setTimeout(resolve, 100))

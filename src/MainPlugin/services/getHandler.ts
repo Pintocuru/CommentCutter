@@ -6,12 +6,12 @@ import ElectronStore from 'electron-store'
 export async function handleGetRequest(
   pathSegments: string[],
   params: Record<string, string>,
-  store: ElectronStore<DataSchemaType>
+  electronStore: ElectronStore<DataSchemaType>
 ): Promise<PluginResponse> {
   try {
     // パスによって処理を分岐
-    const storeData = store.get('store') as DataSchemaType
-    const resource = pathSegments[0] || 'data'
+    const resource = params.type || 'data'
+    const storeData = electronStore.store
 
     switch (resource) {
       case 'data':

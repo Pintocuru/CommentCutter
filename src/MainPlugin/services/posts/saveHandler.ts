@@ -6,12 +6,12 @@ import { DataSchemaType } from '@/types/type'
 import ElectronStore from 'electron-store'
 
 export async function handleSaveData(
-  store: ElectronStore<DataSchemaType>,
+  electronStore: ElectronStore<DataSchemaType>,
   data: DataSchemaType
 ): Promise<PluginResponse> {
   try {
     // ストアのデータを更新
-    store.store = data
+    electronStore.store = data
     postSystemMessage('データが正常に保存されました', SETTINGS.botName)
 
     return {
@@ -19,7 +19,7 @@ export async function handleSaveData(
       response: JSON.stringify({
         success: true,
         message: 'Data saved successfully',
-        data: store.store,
+        data: electronStore.store,
       }),
     }
   } catch (error) {

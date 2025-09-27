@@ -25,10 +25,7 @@ export class OneSdkApiClient implements ApiClient {
 
       // レスポンスの構造に合わせて解析
       const responseData = JSON.parse(response.data.response)
-
-      if (resource === 'data') {
-        return responseData.data || {}
-      }
+      if (resource === 'data') return responseData.data || {}
 
       return responseData
     } catch (error) {
@@ -40,13 +37,13 @@ export class OneSdkApiClient implements ApiClient {
   async post(resource: string = 'save', data: any): Promise<any> {
     const url = `${this.baseUrl}?mode=post&type=${resource}`
 
-    const config = {
+    const payload = {
       headers: { 'Content-Type': 'application/json' },
-      data: data,
+      data: JSON.stringify(data),
     }
 
     try {
-      const response: AxiosResponse = await OneSDK.post(url, config)
+      const response: AxiosResponse = await OneSDK.post(url, payload)
 
       this.validateResponse(response)
 
@@ -61,7 +58,7 @@ export class OneSdkApiClient implements ApiClient {
 
   private validateResponse(response: AxiosResponse): void {
     if (!response.data || response.data.code !== 200) {
-      throw new Error(`API request failed: ${response.data?.message || 'Unknown error'}`)
+      throw new Error(`API request failed: ${response.data?.message || response.data.code}`)
     }
   }
 }
