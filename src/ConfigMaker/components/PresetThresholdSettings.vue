@@ -3,10 +3,11 @@
   <!-- 条件設定の説明 -->
   <InformationCard>
     <p>
-      <code class="label bg-accent text-accent-content">発動条件設定</code>では、
-      コメントを送ったユーザーの「ギフトの有無」や「チャット数」などの情報をもとに、
+      <code class="label bg-accent text-accent-content"
+        >コメントテスターのコメントは、設定にかかわらず、必ず表示されます。</code
+      >
+      テストを行う際はご注意下さい。
     </p>
-    <p>ルールを発動するかどうかを決めることができます。</p>
     <p>
       <code class="label bg-accent text-accent-content">発動条件が複数の場合は、すべての条件を満たしたときだけ</code
       >ルールが発動します。
@@ -62,7 +63,6 @@
   import SettingItem from '@shared/components/parts/SettingItem.vue'
   import { useCommentCutterStore } from '../../stores/pluginStore'
 
-  // TODO: 実際のThreshold編集コンポーネントの実装
   import ThresholdComment from '@shared/components/threshold/ThresholdComment.vue'
   import ThresholdAccess from '@shared/components/threshold/ThresholdAccess.vue'
   import ThresholdGift from '@shared/components/threshold/ThresholdGift.vue'

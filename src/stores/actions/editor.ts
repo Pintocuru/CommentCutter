@@ -29,7 +29,6 @@ export const createEditorActions = (state: ReturnType<typeof createState>) => {
     // エディターのUIテーマを管理
     setTheme: (theme: 'light' | 'dark') => {
       state.data.value.theme = theme
-      ConsolePost('info', `エディターテーマを${theme}に設定しました`)
     },
   }
 

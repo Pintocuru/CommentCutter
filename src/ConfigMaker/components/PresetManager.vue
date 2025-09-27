@@ -13,7 +13,10 @@
 
     <!-- プリセットタブとエディター -->
     <div v-if="store.hasPresets">
+      <!-- プリセットタブ -->
       <PresetTabs />
+
+      <!-- エディター -->
       <PresetEditor />
     </div>
   </div>

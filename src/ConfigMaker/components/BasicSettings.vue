@@ -12,7 +12,7 @@
     </SettingItem>
 
     <!-- ブラックリスト設定 -->
-    <SettingItem label="ブラックリストモード" description="ONの場合、該当したコメントを通しません（フィルター）">
+    <SettingItem label="ブラックリストモード" description="ONで該当を排除。OFFにすると、ホワイトモード(該当以外を排除)">
       <input type="checkbox" v-model="isBlacklist" class="toggle toggle-primary" />
     </SettingItem>
 

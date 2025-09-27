@@ -13,7 +13,7 @@ export const useAutoSave = () => {
   const isSaving = ref(false)
 
   // 設定可能な値
-  const DEBOUNCE_DELAY = 2000 // 2秒のデバウンス
+  const DEBOUNCE_DELAY = 5000 // 2秒のデバウンス
 
   // デバウンス付き保存関数
   const debouncedSave = async () => {

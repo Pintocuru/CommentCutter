@@ -7,7 +7,7 @@ import { ElectronStoreManager } from '../../store/ElectronStoreManager'
 export async function handleFilterComment(comment: Comment): Promise<Comment | false> {
   try {
     // コメントテスターであれば必ずcommentを返す
-    if (comment.id === 'COMMENT_TESTER') return comment
+    // if (comment.id === 'COMMENT_TESTER') return comment
 
     const esm = ElectronStoreManager.getInstance()
     const currentPreset = esm.currentPreset()
