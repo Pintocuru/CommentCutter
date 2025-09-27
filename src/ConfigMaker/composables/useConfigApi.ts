@@ -3,6 +3,7 @@ import { useCommentCutterStore } from '@/stores/pluginStore'
 import type { DataSchemaType } from '@/types/type'
 import { OneSdkApiClient } from '@/api/OneSdkApiClient'
 import { isDev, isRealApi, SETTINGS } from '@/types/settings'
+import { toRaw } from 'vue'
 
 export const useConfigApi = () => {
   const store = useCommentCutterStore()
@@ -47,7 +48,7 @@ export const useConfigApi = () => {
       console.log('Loading config from mock API...')
       // デモデータを返す
       return {
-        target: '',
+        target: 'demo_preset',
         theme: 'dark',
         presets: {
           demo_preset: {
@@ -77,12 +78,20 @@ export const useConfigApi = () => {
   // 設定の保存
   const saveConfig = async () => {
     try {
+      console.log(store.data)
+
       if (isDev && !isRealApi) {
         // 開発環境なら告知のみ
         await mockEditorApi.saveConfig(store.data)
       } else {
+        console.log('lowData', store.data)
+        const payload = toRaw(store.data)
+        console.log('payload before post:', payload)
+        const response = await ApiClient.post('save', payload)
+        console.log('response:', response)
+
         // 本番環境での保存処理を実装
-        await ApiClient.post('save', store.data)
+        //        await ApiClient.post('save', store.data)
       }
       console.log('Config saved successfully')
     } catch (error) {

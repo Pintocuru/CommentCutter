@@ -14,15 +14,28 @@ export async function handlePostRequest(
 ): Promise<PluginResponse> {
   try {
     // bodyのバリデーション
-    if (!body) {
+    if (!body || !body.data) {
       return {
         code: 400,
-        response: JSON.stringify({ error: 'Request body is required' }),
+        response: JSON.stringify({ error: 'Request body and data are required' }),
       }
     }
 
-    // Zodでバリデーション
-    const validationResult = DataSchema.safeParse(body)
+    // 🔥 修正：body.data（JSON文字列）をパースしてからバリデーション
+    let parsedData
+    try {
+      parsedData = JSON.parse(body.data)
+    } catch (parseError) {
+      return {
+        code: 400,
+        response: JSON.stringify({ error: 'Invalid JSON in request body' }),
+      }
+    }
+
+    console.info('解析後のデータ:', parsedData)
+
+    // Zodでバリデーション（解析後のデータに対して）
+    const validationResult = DataSchema.safeParse(parsedData)
     if (!validationResult.success) {
       postSystemMessage('データフォーマットエラーが発生しました', SETTINGS.botName)
 
@@ -41,7 +54,6 @@ export async function handlePostRequest(
     const action = params.type || 'save'
 
     switch (action) {
-      // 基本こっちしか使わない
       case 'save':
         return await handleSaveData(store, validatedData)
 
