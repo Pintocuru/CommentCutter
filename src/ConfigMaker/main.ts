@@ -1,9 +1,9 @@
 // src/ConfigMaker/main.ts
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import ErrorHandler from '@shared/utils/ErrorHandler/ErrorHandler'
 import App from './App.vue'
-import '@shared/styles/DaisyUi.css'
+import ErrorHandler from '@shared/utils/ErrorHandler/ErrorHandler'
+import '../../assets/styles/DaisyUi.css'
 import OneSDK from '@onecomme.com/onesdk'
 
 async function initApp() {

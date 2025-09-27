@@ -6,7 +6,8 @@
     "dev:CommentCutter": "vite",
     "lint:CommentCutter": "eslint src/**/*.{ts,vue}",
     "build:CommentCutterPlugin": "vite build",
-    "build:CommentCutterConfig": "webpack",
+    "build:CommentCutterEditor": "webpack",
+    "build:CommentCutterBuild": "tsx webpackBuild.ts",
     "test": "vitest"
   },
   "author": "Pintocuru(せすじピンとしてます)",
