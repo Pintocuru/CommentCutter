@@ -8,17 +8,8 @@ export class ElectronStoreManager {
 
   private constructor(private readonly electronStore: ElectronStore<DataSchemaType>) {}
 
-  static init(electronStore: ElectronStore): ElectronStoreManager {
-    const storeData = electronStore.store as DataSchemaType
-    if (!storeData) {
-      const errorMsg = 'ストアデータが見つからないか、形式が不正です。'
-      ConsolePost('error', errorMsg)
-      throw new Error(errorMsg)
-    }
-
-    // ! ダブルキャスト
-    const typedStore = electronStore as unknown as ElectronStore<DataSchemaType>
-    this.instance = new ElectronStoreManager(typedStore)
+  static init(electronStore: ElectronStore<DataSchemaType>): ElectronStoreManager {
+    this.instance = new ElectronStoreManager(electronStore)
     return this.instance
   }
 
