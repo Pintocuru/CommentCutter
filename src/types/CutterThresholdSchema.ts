@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   AccessConditionSchema,
   CountConditionSchema,
+  EnabledServiceConditionSchema,
   GiftConditionSchema,
   thresholdConditionDescriptions,
   thresholdConditionLabels,
@@ -11,7 +12,7 @@ import {
 /**
  * コメントカッタープラグイン用Threshold
  */
-export const CutterThresholdCondition = ['comment', 'access', 'gift', 'count', 'userId', 'username'] as const
+export const CutterThresholdCondition = ['comment', 'access', 'gift', 'count', 'userId', 'username', 'service'] as const
 export type CutterThresholdCondition = (typeof CutterThresholdCondition)[number]
 
 export const CutterThresholdConditionLabels = Object.fromEntries(
@@ -32,6 +33,7 @@ export const CutterThresholdSchema = z.object({
   count: CountConditionSchema.catch(CountConditionSchema.parse({})).optional(),
   userId: z.array(z.string()).catch([]).optional(),
   username: z.array(z.string()).catch([]).optional(),
+  service: z.array(EnabledServiceConditionSchema).default([]).optional(),
 })
 
 export type CutterThresholdType = z.infer<typeof CutterThresholdSchema>

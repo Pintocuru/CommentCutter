@@ -10,12 +10,10 @@ export const PresetSchema = z.object({
   ...BaseSchema.shape,
   isBlacklist: z.boolean().default(true), // 該当したら通さない（フィルター）
   isFilterSpeech: z.boolean().default(false), // 該当したら読み上げだけフィルター
-  threshold: CutterThresholdSchema.default(
-    CutterThresholdSchema.parse({
-      conditions: ['comment'],
-      comment: ['おみくじ'],
-    })
-  ).catch(CutterThresholdSchema.parse({ conditions: [] })), // コメント発火条件
+  threshold: CutterThresholdSchema.default({
+    conditions: ['comment'],
+    comment: ['おみくじ'],
+  }).catch({ conditions: [] }), // コメント発火条件
 })
 
 /**

@@ -45,6 +45,9 @@
 
   <!-- ユーザー名条件 -->
   <ThresholdUsername v-if="conditions?.includes('username')" v-model="username" />
+
+  <!-- サービス条件 -->
+  <ThresholdService v-if="conditions?.includes('service')" v-model="service" />
 </template>
 
 <script setup lang="ts">
@@ -63,6 +66,7 @@
   import ThresholdCount from '@shared/components/threshold/ThresholdCount.vue'
   import ThresholdUserId from '@shared/components/threshold/ThresholdUserId.vue'
   import ThresholdUsername from '@shared/components/threshold/ThresholdUsername.vue'
+  import ThresholdService from '@shared/components/threshold/ThresholdService.vue'
   import InformationCard from '@shared/components/parts/InformationCard.vue'
 
   const store = useCommentCutterStore()
@@ -92,6 +96,7 @@
   const count = createComputed('count')
   const userId = createComputed('userId')
   const username = createComputed('username')
+  const service = createComputed('service')
 
   // 条件タイプの選択肢
   const conditionTypes = Object.entries(CutterThresholdConditionLabels).map(([value, label]) => ({
