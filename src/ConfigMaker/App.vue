@@ -4,7 +4,7 @@
     <div class="p-4 max-w-6xl min-w-xl pb-64 overflow-x-hidden mx-auto" :data-theme="data.theme">
       <!-- タイトル -->
       <h1 class="flex justify-center text-2xl font-bold mb-6 text-center relative">
-        <div class="flex items-center gap-2">コメントカッタープラグイン コンフィグエディター</div>
+        <div class="flex items-center gap-2">コメントフィルターアドバンス コンフィグエディター</div>
       </h1>
 
       <!-- 適用するルール選択 -->
@@ -21,7 +21,7 @@
     <Toaster :expand="true" :richColors="true" :visibleToasts="5" />
   </div>
   <div v-else>
-    <ErrorInitComponent :isPlugin="true" pluginName="コメントカッタープラグイン" />
+    <ErrorInitComponent :isPlugin="true" pluginName="コメントフィルターアドバンス" />
   </div>
 </template>
 

@@ -17,7 +17,10 @@
     </SettingItem>
 
     <!-- 読み上げフィルター設定 -->
-    <SettingItem label="読み上げフィルター" description="ONの場合、該当したコメントの読み上げのみをフィルターします">
+    <SettingItem
+      label="読み上げのみフィルタリングする"
+      description="ONの場合、読み上げは行われませんが表示はされます。"
+    >
       <input type="checkbox" v-model="isFilterSpeech" class="toggle toggle-primary" />
     </SettingItem>
   </div>

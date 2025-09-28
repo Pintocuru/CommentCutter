@@ -1,5 +1,4 @@
 // src/MainPlugin/plugin.ts
-import { SETTINGS } from '@/types/settings'
 import { DataSchema } from '@/types/type'
 import { handlePostRequest } from './services/postHandler'
 import { handleGetRequest } from './services/getHandler'
@@ -7,14 +6,19 @@ import { ElectronStoreManager } from './store/ElectronStoreManager'
 import { createErrorResponse } from './services/utils/responseHelpers'
 import { handleFilterComment } from './scripts/filterLogic/filterLogic'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
+import { fileURLToPath } from 'url'
+import path from 'path'
 import { OnePlugin, PluginResponse, PluginRequest } from '@onecomme.com/onesdk/'
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 const plugin: OnePlugin = {
-  name: 'コメントカッタープラグイン CommentCutter',
-  uid: SETTINGS.PLUGIN_UID,
-  version: '0.0.1',
+  name: 'コメントフィルターアドバンス CommentCutter',
+  uid: 'CommentCutter',
+  version: '1.0.0-rc1',
   author: 'Pintocuru',
-  url: '',
+  url: path.resolve(__dirname, './index.html'),
   permissions: ['filter.comment'],
 
   defaultState: DataSchema.parse({}),

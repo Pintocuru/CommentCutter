@@ -1,7 +1,8 @@
 {
   "name": "comment-cutter",
-  "version": "0.0.1",
-  "description": "コメントフィルタープラグイン",
+  "version": "1.0.0-rc1",
+  "displayName": "コメントフィルターアドバンス",
+  "description": "わんコメの標準フィルターを拡張する、高度なコメントフィルタープラグイン (FilterAdvance)。",
   "scripts": {
     "dev:CommentCutter": "vite",
     "lint:CommentCutter": "eslint src/**/*.{ts,vue}",

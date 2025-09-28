@@ -10,7 +10,7 @@ import {
 } from '@shared/types/Threshold/'
 
 /**
- * コメントカッタープラグイン用Threshold
+ * コメントフィルターアドバンス用Threshold
  */
 export const CutterThresholdCondition = ['comment', 'access', 'gift', 'count', 'userId', 'username', 'service'] as const
 export type CutterThresholdCondition = (typeof CutterThresholdCondition)[number]
