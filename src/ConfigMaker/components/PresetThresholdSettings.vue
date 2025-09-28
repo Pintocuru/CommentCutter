@@ -3,14 +3,8 @@
   <!-- 条件設定の説明 -->
   <InformationCard>
     <p>
-      <code class="label bg-accent text-accent-content"
-        >コメントテスターのコメントは、設定にかかわらず、必ず表示されます。</code
-      >
-      テストを行う際はご注意下さい。
-    </p>
-    <p>
-      <code class="label bg-accent text-accent-content">発動条件が複数の場合は、すべての条件を満たしたときだけ</code
-      >ルールが発動します。
+      発動条件が複数の場合は、
+      <code class="label bg-accent text-accent-content">すべての条件を満たしたとき</code>にルールが発動します。(ANDのみ)
     </p>
   </InformationCard>
 

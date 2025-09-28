@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useCommentCutterStore } from '../../stores/pluginStore'
+  import { useCommentCutterStore } from '../../../stores/pluginStore'
 
   const store = useCommentCutterStore()
 </script>

@@ -142,7 +142,7 @@ export const createPresetActions = (
 
   const clearActivePreset = () => {
     coreActions.setData({ target: '' })
-    ConsolePost('info', 'アクティブプリセットをクリアしました')
+    ConsolePost('info', 'アクティブプリセットをOFFにしました')
     state.hasChanged.value = true
   }
 

@@ -1,9 +1,10 @@
 // src/configMaker/composables/useConfigApi.ts
-import { useCommentCutterStore } from '@/stores/pluginStore'
-import type { DataSchemaType } from '@/types/type'
-import { OneSdkApiClient } from '@/api/OneSdkApiClient'
-import { isDev, isRealApi, SETTINGS } from '@/types/settings'
 import { toRaw } from 'vue'
+import { isDev, isRealApi, SETTINGS } from '@/types/settings'
+import type { DataSchemaType } from '@/types/type'
+import { useCommentCutterStore } from '@/stores/pluginStore'
+import { OneSdkApiClient } from '@/api/OneSdkApiClient'
+import { postSystemMessage } from '@shared/sdk/postMessage/PostOneComme'
 
 export const useConfigApi = () => {
   const store = useCommentCutterStore()
@@ -24,8 +25,8 @@ export const useConfigApi = () => {
       }
 
       store.initialize(config)
-      console.log('Config initialized successfully')
     } catch (error) {
+      store.failInit()
       console.error('Failed to initialize config:', error)
       throw error
     }
@@ -84,17 +85,14 @@ export const useConfigApi = () => {
         // 開発環境なら告知のみ
         await mockEditorApi.saveConfig(store.data)
       } else {
-        console.log('lowData', store.data)
         const payload = toRaw(store.data)
-        console.log('payload before post:', payload)
-        const response = await ApiClient.post('save', payload)
-        console.log('response:', response)
-
-        // 本番環境での保存処理を実装
-        //        await ApiClient.post('save', store.data)
+        await ApiClient.post('save', payload)
       }
       console.log('Config saved successfully')
     } catch (error) {
+      postSystemMessage(`保存中にエラーが発生しました: ${error}`)
+      // エラーが発生した場合でも hasChanged は false にして無限ループを防ぐ
+      store.markAsSaved()
       console.error('Failed to save config:', error)
       throw error
     }

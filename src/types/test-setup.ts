@@ -1,5 +1,4 @@
-// src/test-setup.ts
-
+// src\types\test-setup.ts
 import { vi } from 'vitest'
 
 declare global {

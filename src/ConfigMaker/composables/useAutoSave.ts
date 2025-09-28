@@ -1,8 +1,9 @@
-// C:\_root\_nodejs\OmikenTemplates\templates\CommentCutter\src\ConfigMaker\composables\useAutoSave.ts
+// src\ConfigMaker\composables\useAutoSave.ts
 import { watch, ref, onUnmounted } from 'vue'
-import { useCommentCutterStore } from '@/stores/pluginStore'
-import { useConfigApi } from './useConfigApi'
 import { isDev, isRealApi } from '@/types/settings'
+import { useConfigApi } from './useConfigApi'
+import { useCommentCutterStore } from '@/stores/pluginStore'
+import { toast } from 'vue-sonner'
 
 export const useAutoSave = () => {
   const store = useCommentCutterStore()
@@ -13,7 +14,7 @@ export const useAutoSave = () => {
   const isSaving = ref(false)
 
   // 設定可能な値
-  const DEBOUNCE_DELAY = 5000 // 2秒のデバウンス
+  const DEBOUNCE_DELAY = 3000 // デバウンス
 
   // デバウンス付き保存関数
   const debouncedSave = async () => {
@@ -23,19 +24,18 @@ export const useAutoSave = () => {
       isSaving.value = true
 
       if (isDev && !isRealApi) {
-        console.log('🔄 Auto-save triggered (dev mode - no actual API call)')
+        toast.info('🔄 Auto-save triggered (dev mode - no actual API call)')
         // 開発環境でも少し遅延を入れて実際の保存をシミュレート
         await new Promise((resolve) => setTimeout(resolve, 100))
       } else {
-        console.log('🔄 Auto-saving configuration...')
         await saveConfig()
-        console.log('✅ Configuration auto-saved successfully')
+        toast.success('保存しました')
       }
 
       // 保存完了後、hasChanged を false にリセット
       store.markAsSaved()
     } catch (error) {
-      console.error('❌ Auto-save failed:', error)
+      toast.error(`保存に失敗しました:${error}`)
       // エラーが発生した場合でも hasChanged は false にして無限ループを防ぐ
       store.markAsSaved()
     } finally {

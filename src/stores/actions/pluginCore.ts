@@ -17,17 +17,17 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
   const initialize = async (apiClient: DataSchemaType) => {
     try {
       state.data.value = apiClient
-      state.isInitialized.value = true
-
-      ConsolePost('info', 'ストアを読み込みました')
     } catch (error) {
       // 初期化エラーの場合はデフォルトデータで初期化を続行
       console.warn('Failed to load data from API, using default data:', error)
       state.data.value = DataSchema.parse({})
-      state.isInitialized.value = true
 
       ConsolePost('warn', 'デフォルトデータでストアを初期化しました')
     }
+  }
+
+  const failInit = () => {
+    state.isInitialized.value = false
   }
 
   const updateData = (newData: DataSchemaType) => {
@@ -93,6 +93,7 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
   return {
     setData,
     initialize,
+    failInit,
     reset,
     updateData,
     updateDataPartial,

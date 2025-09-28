@@ -4,7 +4,6 @@ import webpack from 'webpack'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { VueLoaderPlugin } from 'vue-loader'
-import TerserPlugin from 'terser-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import { createExternals } from '../../shared/utils/webpackBuild/buildOptions/externals'
@@ -12,6 +11,7 @@ import { createModuleRules } from '../../shared/utils/webpackBuild/buildOptions/
 import tsconfig from './tsconfig.json'
 import { createAliases } from '../../shared/utils/webpackBuild/utils/createAliases'
 import { createResolveConfig } from '../../shared/utils/webpackBuild/buildOptions/resolve'
+import { createOptimizationConfig } from '../../shared/utils/webpackBuild/buildOptions/optimization'
 
 // __dirname の設定
 const __filename = fileURLToPath(import.meta.url)
@@ -36,38 +36,14 @@ const config: webpack.Configuration = {
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: path.resolve(__dirname, 'assets/index.html'), // ここでHTMLテンプレート指定
+      template: path.resolve(__dirname, 'assets/index.html'),
       inject: 'body',
     }),
     new MiniCssExtractPlugin({
       filename: 'styles/[name].css',
     }),
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minSize: 20000,
-      automaticNameDelimiter: '-',
-      cacheGroups: {
-        pinia: {
-          test: /[\\/]node_modules[\\/]pinia[\\/]/,
-          name: 'pinia-vendor',
-          chunks: 'all',
-          enforce: true,
-        },
-        defaultVendors: {
-          test: /[\\/]node_modules[\\/]/,
-          name(module) {
-            return 'vendors'
-          },
-          chunks: 'all',
-          priority: -10,
-        },
-      },
-    },
-    minimize: true,
-    minimizer: [new TerserPlugin({ extractComments: false })],
-  },
+  optimization: createOptimizationConfig(),
 }
 
 async function build() {

@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import ErrorHandler from '@shared/utils/ErrorHandler/ErrorHandler'
+import 'vue-sonner/style.css'
 import '../../assets/styles/DaisyUi.css'
 import OneSDK from '@onecomme.com/onesdk'
 

@@ -1,52 +1,46 @@
 <!-- src/configMaker/App.vue -->
 <template>
-  <div class="p-4 max-w-6xl min-w-xl pb-64 overflow-x-hidden mx-auto" :data-theme="data.theme">
-    <!-- タイトル -->
-    <h1 class="flex justify-center text-2xl font-bold mb-6 text-center relative">
-      <div class="flex items-center gap-2">コメントカッタープラグイン コンフィグエディター</div>
-    </h1>
+  <div v-if="isInitialized">
+    <div class="p-4 max-w-6xl min-w-xl pb-64 overflow-x-hidden mx-auto" :data-theme="data.theme">
+      <!-- タイトル -->
+      <h1 class="flex justify-center text-2xl font-bold mb-6 text-center relative">
+        <div class="flex items-center gap-2">コメントカッタープラグイン コンフィグエディター</div>
+      </h1>
 
-    <!-- 適用するルール選択 -->
-    <RuleSelector />
+      <!-- 適用するルール選択 -->
+      <RuleSelector />
 
-    <!-- プリセット管理セクション -->
-    <PresetManager />
+      <!-- プリセット管理セクション -->
+      <PresetManager />
+    </div>
+
+    <!-- 表示トグルボタン -->
+    <ThemeToggle />
+
+    <!-- トースト通知 -->
+    <Toaster :expand="true" :richColors="true" :visibleToasts="5" />
   </div>
-
-  <!-- 表示トグルボタン -->
-  <label class="swap swap-rotate fixed top-6 right-6 z-[9999]">
-    <input type="checkbox" v-model="showDark" />
-
-    <!-- Dark モード時: 月アイコン -->
-    <Moon class="swap-on w-8 h-8 text-primary" />
-
-    <!-- Light モード時: 太陽アイコン -->
-    <Sun class="swap-off w-8 h-8 text-primary" />
-  </label>
+  <div v-else>
+    <ErrorInitComponent :isPlugin="true" pluginName="コメントカッタープラグイン" />
+  </div>
 </template>
 
 <script setup lang="ts">
-  import { onMounted, onUnmounted, ref, watch } from 'vue'
+  import { onMounted, onUnmounted } from 'vue'
   import RuleSelector from './components/RuleSelector.vue'
   import PresetManager from './components/PresetManager.vue'
+  import ThemeToggle from './components/appItems/ThemeToggle.vue'
   import { useCommentCutterStore } from '../stores/pluginStore'
   import { useConfigApi } from './composables/useConfigApi'
   import { useAutoSave } from './composables/useAutoSave'
+  import ErrorInitComponent from '@shared/components/error/ErrorInfoDaisy.vue'
   import { storeToRefs } from 'pinia'
-  import { Sun, Moon } from 'lucide-vue-next'
+  import { Toaster } from 'vue-sonner'
 
   const store = useCommentCutterStore()
-  const { data } = storeToRefs(store)
+  const { data, isInitialized } = storeToRefs(store)
   const configApi = useConfigApi()
   const { setupAutoSave, forceSave } = useAutoSave()
-
-  // テーマ切替フラグ
-  const showDark = ref(false)
-
-  // showDark が切り替わったら DaisyUI テーマを更新
-  watch(showDark, (val) => {
-    store.editorState.setTheme(val ? 'dark' : 'light')
-  })
 
   // 初期化処理
   onMounted(async () => {
@@ -58,9 +52,6 @@
       if (presetKeys.length > 0) {
         store.selectPreset(presetKeys[0])
       }
-
-      // デフォルトをテーマに反映
-      showDark.value = data.value.theme === 'dark'
 
       // 自動保存を設定
       setupAutoSave()
