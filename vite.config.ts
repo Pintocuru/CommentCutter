@@ -34,7 +34,7 @@ export default defineConfig(() => {
 
       // ロールアップ設定
       rollupOptions: {
-        plugins: [visualizer({ open: true })],
+        // plugins: [visualizer({ open: true })], // 同梱物チェック用
         // 外部依存関係の指定
         external: [
           'fs',
@@ -61,7 +61,7 @@ export default defineConfig(() => {
       minify: 'terser',
       terserOptions: {
         compress: {
-          drop_console: false,
+          drop_console: false, // Console.logを削除するか
           drop_debugger: true,
         },
         mangle: {
