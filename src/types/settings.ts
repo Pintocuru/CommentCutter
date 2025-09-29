@@ -5,7 +5,7 @@ export const isDev = import.meta.env?.VITE_IS_DEV || false
 export const isRealApi = import.meta.env?.VITE_IS_REAL_API || true
 
 // プラグインのUID
-const PLUGIN_UID_DEFAULT = 'CommentCutter'
+const PLUGIN_UID_DEFAULT = 'FilterAdvance'
 const PLUGIN_UID = import.meta.env?.PLUGIN_UID || PLUGIN_UID_DEFAULT
 
 // 設定オブジェクト SETTINGS

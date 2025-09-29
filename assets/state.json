@@ -1,0 +1,82 @@
+{
+  "target": "memberOnly",
+  "theme": "dark",
+  "presets": {
+    "memberOnly": {
+      "id": "memberOnly",
+      "key": "memberOnly",
+      "name": "メンバーのみ読み上げ",
+      "description": "有料のサービス加入者のコメントを読み上げる(Youtubeのメンバー・Twitchのサブスク、ニコ生のプレミアム会員など)",
+      "createdAt": "2025-09-27T14:22:02.564Z",
+      "updatedAt": "2025-09-27T14:28:46.477Z",
+      "isBlacklist": false,
+      "isFilterSpeech": true,
+      "threshold": {
+        "conditions": ["access"],
+        "comment": ["おみくじ"],
+        "access": ["member", "subscriber", "premium"],
+        "service": []
+      }
+    },
+    "giftOnly": {
+      "id": "giftOnly",
+      "key": "giftOnly",
+      "name": "ギフトのみ読み上げ",
+      "description": "ギフトした方のコメントを読み上げます。",
+      "createdAt": "2025-09-27T14:32:53.990Z",
+      "updatedAt": "2025-09-27T14:59:16.991Z",
+      "isBlacklist": false,
+      "isFilterSpeech": true,
+      "threshold": {
+        "conditions": ["gift"],
+        "comment": ["おみくじ"],
+        "access": [],
+        "gift": ["all"],
+        "service": []
+      }
+    },
+    "hideOwner": {
+      "id": "hideOwner",
+      "key": "hideOwner",
+      "name": "配信者を非表示",
+      "description": "配信者のみ、わんコメに表示されないようにします。",
+      "createdAt": "2025-09-27T07:25:23.859Z",
+      "updatedAt": "2025-09-28T17:20:16.355Z",
+      "isBlacklist": true,
+      "isFilterSpeech": false,
+      "threshold": {
+        "conditions": ["access"],
+        "comment": ["おみくじ"],
+        "access": ["owner"],
+        "gift": ["all"],
+        "count": {
+          "comparison": "lowerBound",
+          "unit": "lc",
+          "value": 1
+        },
+        "service": []
+      }
+    },
+    "1758958751332": {
+      "id": "1758958751332",
+      "key": "1758958751332",
+      "name": "101回以上コメントした一般ユーザーを非表示",
+      "description": "コメントの多すぎるユーザーを非表示にします",
+      "createdAt": "2025-09-27T07:39:11.332Z",
+      "updatedAt": "2025-09-28T17:19:41.333Z",
+      "isBlacklist": true,
+      "isFilterSpeech": false,
+      "threshold": {
+        "conditions": ["count", "access"],
+        "comment": ["おみくじ"],
+        "access": ["basic"],
+        "count": {
+          "comparison": "lowerBound",
+          "unit": "lc",
+          "value": 101
+        },
+        "service": []
+      }
+    }
+  }
+}

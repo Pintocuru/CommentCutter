@@ -14,8 +14,8 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const plugin: OnePlugin = {
-  name: 'コメントフィルターアドバンス CommentCutter',
-  uid: 'CommentCutter',
+  name: 'コメントフィルターアドバンス FilterAdvance',
+  uid: 'FilterAdvance',
   version: '1.0.0-rc1',
   author: 'Pintocuru',
   url: path.resolve(__dirname, './index.html'),
