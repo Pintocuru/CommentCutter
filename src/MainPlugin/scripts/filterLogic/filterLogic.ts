@@ -1,7 +1,7 @@
 // src\MainPlugin\scripts\filterLogic\filterLogic.ts
 import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
 import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
-import { Comment } from '@onecomme.com/onesdk/'
+import { Comment } from '@onecomme.com/onesdk/types/Comment'
 import { ElectronStoreManager } from '../../store/ElectronStoreManager'
 
 export async function handleFilterComment(comment: Comment): Promise<Comment | false> {

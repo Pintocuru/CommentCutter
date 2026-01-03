@@ -1,5 +1,5 @@
 // src\api\OneSdkApiClient.ts
-import OneSDK from '@onecomme.com/onesdk'
+import { api } from '@shared/http/client'
 import type { AxiosResponse } from 'axios'
 
 export interface ApiClient {
@@ -12,18 +12,16 @@ export class OneSdkApiClient implements ApiClient {
   private baseUrl: string
 
   constructor(pluginUid: string) {
-    this.baseUrl = `http://localhost:11180/api/plugins/${pluginUid}`
+    this.baseUrl = `/api/plugins/${pluginUid}`
   }
 
   async get(resource: string = 'data'): Promise<any> {
     const url = `${this.baseUrl}?mode=get&type=${resource}`
 
     try {
-      const response: AxiosResponse = await OneSDK.get(url, {})
-
+      const response = await api.get(url)
       this.validateResponse(response)
 
-      // レスポンスの構造に合わせて解析
       const responseData = JSON.parse(response.data.response)
       if (resource === 'data') return responseData.data || {}
 
@@ -37,17 +35,10 @@ export class OneSdkApiClient implements ApiClient {
   async post(resource: string = 'save', data: any): Promise<any> {
     const url = `${this.baseUrl}?mode=post&type=${resource}`
 
-    const payload = {
-      headers: { 'Content-Type': 'application/json' },
-      data: JSON.stringify(data),
-    }
-
     try {
-      const response: AxiosResponse = await OneSDK.post(url, payload)
-
+      const response = await api.post(url, data)
       this.validateResponse(response)
 
-      // レスポンスの構造に合わせて解析
       const responseData = JSON.parse(response.data.response)
       return responseData
     } catch (error) {
