@@ -2,7 +2,6 @@
 import { defineConfig, mergeConfig } from 'vite'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { visualizer } from 'rollup-plugin-visualizer'
 import { baseViteConfig, rootAlias } from '../../shared/utils/ViteConfig/viteConfigBase'
 import { createAliases } from '../../shared/utils/webpackBuild/utils/createAliases'
 import tsconfig from './tsconfig.json'
