@@ -12,7 +12,7 @@ export class OneSdkApiClient implements ApiClient {
   private baseUrl: string
 
   constructor(pluginUid: string) {
-    this.baseUrl = `/api/plugins/${pluginUid}`
+    this.baseUrl = `/plugins/${pluginUid}`
   }
 
   async get(resource: string = 'data'): Promise<any> {
