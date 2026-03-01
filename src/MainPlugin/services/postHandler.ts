@@ -33,7 +33,7 @@ export async function handlePostRequest(
     console.error('POST handling error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
 
-    postSystemMessage(`保存中にエラーが発生しました: ${errorMessage}`, SETTINGS.botName)
+    postSystemMessage(`保存中にエラーが発生しました: ${errorMessage}`, { username: SETTINGS.botName })
     return createErrorResponse(500, 'Failed to save data', errorMessage)
   }
 }
@@ -47,7 +47,7 @@ function parseAndValidateData(
 
     const validationResult = DataSchema.safeParse(parsedData)
     if (!validationResult.success) {
-      postSystemMessage('データフォーマットエラーが発生しました', SETTINGS.botName)
+      postSystemMessage('データフォーマットエラーが発生しました', { username: SETTINGS.botName })
 
       return {
         success: false,

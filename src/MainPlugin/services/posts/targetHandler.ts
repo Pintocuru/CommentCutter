@@ -19,7 +19,7 @@ export async function handleTargetUpdate(
 
     store.set('target', data.target)
 
-    postSystemMessage(`アクティブプリセットを変更しました`, SETTINGS.botName)
+    postSystemMessage(`アクティブプリセットを変更しました`, { username: SETTINGS.botName })
 
     return {
       code: 200,

@@ -55,9 +55,9 @@ async function handlePresetAddOrUpdate(
   store.set(presetKeyPath, updatedPreset)
 
   if (operation === 'add') {
-    postSystemMessage(`プリセット「${updatedPreset.name}」を追加しました`, SETTINGS.botName)
+    postSystemMessage(`プリセット「${updatedPreset.name}」を追加しました`, { username: SETTINGS.botName })
   } else {
-    postSystemMessage(`プリセット「${updatedPreset.name}」を更新しました`, SETTINGS.botName)
+    postSystemMessage(`プリセット「${updatedPreset.name}」を更新しました`, { username: SETTINGS.botName })
   }
 
   return {
@@ -77,7 +77,7 @@ async function handlePresetDelete(store: ElectronStore<DataSchemaType>, data: Da
 
   const presetKeyPath = `presets.${data.target}`
   store.delete(presetKeyPath as any)
-  postSystemMessage(`プリセットを削除しました`, SETTINGS.botName)
+  postSystemMessage(`プリセットを削除しました`, { username: SETTINGS.botName })
 
   return {
     code: 200,
