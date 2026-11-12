@@ -18,8 +18,6 @@ const baseConfig: Omit<InlineConfig, 'build'> = {
   root: projectRoot,
   mode: 'production',
   envDir: false,
-  plugins: [vue(), tailwindcss()],
-  css: { postcss: { plugins: [] } },
   resolve: { alias },
 }
 
@@ -76,6 +74,8 @@ async function main(): Promise<void> {
   console.log('[Build] Building ConfigMaker UI...')
   await build({
     ...baseConfig,
+    plugins: [vue(), tailwindcss()],
+    css: { postcss: { plugins: [] } },
     esbuild: { drop: ['console', 'debugger'] },
     build: {
       outDir: distDir,
