@@ -6,9 +6,8 @@
   "scripts": {
     "dev:CommentCutter": "vite",
     "lint:CommentCutter": "eslint src/**/*.{ts,vue}",
-    "build:CommentCutterPlugin": "vite build",
-    "build:CommentCutterBuild": "tsx webpackBuild.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "build:CommentCutter": "tsx build.ts"
   },
   "author": "Pintocuru(せすじピンとしてます)",
   "license": "Apache-2.0",
