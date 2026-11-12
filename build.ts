@@ -16,6 +16,7 @@ const distDir = path.join(projectRoot, 'dist')
 const baseConfig: Omit<InlineConfig, 'build'> = {
   configFile: false,
   root: projectRoot,
+  base: './',
   mode: 'production',
   envDir: false,
   resolve: { alias },
