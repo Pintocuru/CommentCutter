@@ -16,7 +16,7 @@ export class OneSdkApiClient implements ApiClient {
   }
 
   async get(resource: string = 'data'): Promise<any> {
-    const url = `${this.baseUrl}?mode=get&type=${resource}`
+    const url = `${this.baseUrl}?mode=get&type=${encodeURIComponent(resource)}`
 
     try {
       const response = await api.get(url)
@@ -33,7 +33,7 @@ export class OneSdkApiClient implements ApiClient {
   }
 
   async post(resource: string = 'save', data: any): Promise<any> {
-    const url = `${this.baseUrl}?mode=post&type=${resource}`
+    const url = `${this.baseUrl}?mode=post&type=${encodeURIComponent(resource)}`
 
     try {
       const response = await api.post(url, data)
@@ -48,8 +48,15 @@ export class OneSdkApiClient implements ApiClient {
   }
 
   private validateResponse(response: AxiosResponse): void {
-    if (!response.data || response.data.code !== 200) {
-      throw new Error(`API request failed: ${response.data?.message || response.data.code}`)
+    if (response.data?.code === 200) return
+
+    // サーバーは { code, response: '{"error": "...", "details": ...}' } 形式で返す
+    let detail: unknown = response.data?.code ?? 'no response'
+    try {
+      detail = JSON.parse(response.data?.response)?.error ?? detail
+    } catch {
+      // response が JSON でなければ code をそのまま使う
     }
+    throw new Error(`API request failed: ${detail}`)
   }
 }

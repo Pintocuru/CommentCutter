@@ -48,6 +48,9 @@ export const createPresetActions = (
       const updated: PresetType = {
         ...original,
         ...updates,
+        // レコードのキーとずれないよう、id / key は変更させない
+        id: original.id,
+        key: original.key,
         updatedAt: new Date().toISOString(),
       }
 
@@ -75,12 +78,9 @@ export const createPresetActions = (
       }
 
       const { [key]: _, ...rest } = state.data.value.presets
-      coreActions.setData({ presets: rest })
-
-      // アクティブなプリセットが削除された場合はクリア
-      if (state.data.value.target === key) {
-        coreActions.setData({ target: '' })
-      }
+      // アクティブなプリセットが削除された場合は target もクリア(1回の更新にまとめる)
+      const target = state.data.value.target === key ? '' : state.data.value.target
+      coreActions.setData({ presets: rest, target })
 
       // 選択中のプリセットが削除された場合はクリア
       if (state.selectedPresetId.value === key) {
@@ -103,13 +103,16 @@ export const createPresetActions = (
         throw new Error(`プリセット（ID: ${key}）が見つかりません`)
       }
 
+      // 時刻は1回だけ取得し、id と key を必ず一致させる
+      const now = new Date()
+      const newKey = `${key}_copy_${now.getTime()}`
       const duplicatedPreset = {
         ...originalPreset,
-        id: `${key}_copy_${Date.now()}`,
-        key: `${originalPreset.key}_copy_${Date.now()}`,
+        id: newKey,
+        key: newKey,
         name: `${originalPreset.name} のコピー`,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+        createdAt: now.toISOString(),
+        updatedAt: now.toISOString(),
       }
 
       const newPreset = addPreset(duplicatedPreset)

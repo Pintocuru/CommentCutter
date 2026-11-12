@@ -1,0 +1,11 @@
+diff a/src/MainPlugin/scripts/filterLogic/filterLogic.ts b/src/MainPlugin/scripts/filterLogic/filterLogic.ts	(rejected hunks)
+@@ -3,8 +3,7 @@ import { checkAllConditions } from '@shared/utils/threshold/ThresholdChecker'
+ import { ConsolePost } from '@shared/sdk/postMessage/ConsolePost'
+ import { Comment } from '@onecomme.com/onesdk/types/Comment'
+ import { ElectronStoreManager } from '../../store/ElectronStoreManager'
+-
+-const isDev = process.env.NODE_ENV === 'development'
++import { isDev } from '@/types/settings'
+ 
+ export async function handleFilterComment(comment: Comment): Promise<Comment | false> {
+   try {

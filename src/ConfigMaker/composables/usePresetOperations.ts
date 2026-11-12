@@ -11,7 +11,7 @@ export const usePresetOperations = () => {
       store.selectPreset(newPreset.key) // 追加されたプリセットを自動選択
       return newPreset
     } catch (error) {
-      console.error('Failed to duplicate preset:', error)
+      console.error('Failed to add preset:', error)
       throw error
     }
   }
@@ -52,7 +52,7 @@ export const usePresetOperations = () => {
       const duplicatedPreset = store.duplicatePreset(store.selectedPresetId)
 
       // 複製されたプリセットを選択
-      store.selectPreset(duplicatedPreset.id)
+      store.selectPreset(duplicatedPreset.key)
 
       return duplicatedPreset
     } catch (error) {

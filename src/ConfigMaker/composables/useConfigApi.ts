@@ -79,8 +79,6 @@ export const useConfigApi = () => {
   // 設定の保存
   const saveConfig = async () => {
     try {
-      console.log(store.data)
-
       if (isDev && !isRealApi) {
         // 開発環境なら告知のみ
         await mockEditorApi.saveConfig(store.data)
@@ -91,8 +89,6 @@ export const useConfigApi = () => {
       console.log('Config saved successfully')
     } catch (error) {
       postSystemMessage(`保存中にエラーが発生しました: ${error}`)
-      // エラーが発生した場合でも hasChanged は false にして無限ループを防ぐ
-      store.markAsSaved()
       console.error('Failed to save config:', error)
       throw error
     }

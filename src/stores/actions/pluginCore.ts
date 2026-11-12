@@ -14,9 +14,9 @@ export const createCoreActions = (state: ReturnType<typeof createState>) => {
     }
   }
 
-  const initialize = async (apiClient: DataSchemaType) => {
+  const initialize = async (initialData: unknown) => {
     try {
-      state.data.value = apiClient
+      state.data.value = DataSchema.parse(initialData)
     } catch (error) {
       // 初期化エラーの場合はデフォルトデータで初期化を続行
       console.warn('Failed to load data from API, using default data:', error)

@@ -1,6 +1,5 @@
 // src\ConfigMaker\composables\useAutoSave.ts
 import { watch, ref, onUnmounted } from 'vue'
-import { isDev, isRealApi } from '@/types/settings'
 import { useConfigApi } from './useConfigApi'
 import { useCommentCutterStore } from '@/stores/pluginStore'
 import { toast } from 'vue-sonner'
@@ -10,34 +9,46 @@ export const useAutoSave = () => {
   const { saveConfig } = useConfigApi()
 
   // デバウンス用のタイマーID
-  let debounceTimer: NodeJS.Timeout | null = null
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null
   const isSaving = ref(false)
 
   // 設定可能な値
   const DEBOUNCE_DELAY = 3000 // デバウンス
 
-  // デバウンス付き保存関数
+  // デバウンスタイマーを張り直す
+  const schedule = () => {
+    if (debounceTimer) clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      debounceTimer = null
+      void debouncedSave()
+    }, DEBOUNCE_DELAY)
+  }
+
+  // 保存処理
   const debouncedSave = async () => {
-    if (isSaving.value) return // 既に保存中の場合はスキップ
+    // 保存中なら完了後にもう一度判定する(編集を取りこぼさない)
+    if (isSaving.value) {
+      schedule()
+      return
+    }
+
+    // 保存開始時点のスナップショット(保存中の編集を検知するため)
+    const snapshot = JSON.stringify(store.data)
 
     try {
       isSaving.value = true
+      await saveConfig()
+      toast.success('保存しました')
 
-      if (isDev && !isRealApi) {
-        toast.info('🔄 Auto-save triggered (dev mode - no actual API call)')
-        // 開発環境でも少し遅延を入れて実際の保存をシミュレート
-        await new Promise((resolve) => setTimeout(resolve, 100))
+      if (JSON.stringify(store.data) === snapshot) {
+        store.markAsSaved()
       } else {
-        await saveConfig()
-        toast.success('保存しました')
+        // 保存中に編集された分は未保存のまま → もう一度保存する
+        schedule()
       }
-
-      // 保存完了後、hasChanged を false にリセット
-      store.markAsSaved()
     } catch (error) {
+      // hasChanged は true のままにする(次の編集、または画面を閉じるときに再試行される)
       toast.error(`保存に失敗しました:${error}`)
-      // エラーが発生した場合でも hasChanged は false にして無限ループを防ぐ
-      store.markAsSaved()
     } finally {
       isSaving.value = false
     }
@@ -45,25 +56,14 @@ export const useAutoSave = () => {
 
   // 自動保存の設定
   const setupAutoSave = () => {
-    // hasChanged が true になるたびにデバウンス付きで自動保存を実行
+    // 編集のたびにデバウンスを張り直す
+    // (hasChanged の false→true だけを見ていると、連続編集や保存中の編集を拾えない)
     watch(
-      () => store.hasChanged,
-      (newValue) => {
-        if (newValue && store.isInitialized) {
-          // 既存のタイマーをクリア
-          if (debounceTimer) {
-            clearTimeout(debounceTimer)
-          }
-
-          // 新しいタイマーを設定
-          debounceTimer = setTimeout(() => {
-            debouncedSave()
-          }, DEBOUNCE_DELAY)
-
-          console.log(`⏰ Auto-save scheduled in ${DEBOUNCE_DELAY}ms`)
-        }
+      () => store.data,
+      () => {
+        if (store.hasChanged && store.isInitialized) schedule()
       },
-      { immediate: false } // 初期化時は実行しない
+      { deep: true }
     )
   }
 

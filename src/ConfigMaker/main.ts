@@ -14,7 +14,8 @@ async function initApp() {
 
     app.use(ErrorHandler)
     app.use(pinia)
-    OneSDK.ready().then(() => app.mount('#App'))
+    await OneSDK.ready()
+    app.mount('#App')
   } catch (error) {
     console.error('アプリケーションの初期化に失敗:', error)
   }

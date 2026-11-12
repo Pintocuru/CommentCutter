@@ -1,8 +1,13 @@
 // src/Modules/settings.ts
 
 // 環境変数があるなら開発、そうでないなら本番
-export const isDev = import.meta.env?.VITE_IS_DEV || false
-export const isRealApi = import.meta.env?.VITE_IS_REAL_API || true
+// 環境変数は文字列で渡ってくる('false' が真と判定されないよう真偽値へ変換する)
+const toBool = (value: unknown, fallback: boolean): boolean =>
+  value === undefined || value === '' ? fallback : value === true || value === 'true'
+
+export const isDev = toBool(import.meta.env?.VITE_IS_DEV, false)
+// .env.development は VITE_USE_REAL_API を使っているため、両方の名前を受け付ける
+export const isRealApi = toBool(import.meta.env?.VITE_IS_REAL_API ?? import.meta.env?.VITE_USE_REAL_API, true)
 
 // プラグインのUID
 const PLUGIN_UID_DEFAULT = 'FilterAdvance'
